@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard de Ventas · Distribuidora Andina</title>
+<style>
+  :root{
+    /* Fondo y superficies */
+    --bg:#fdf2f8; --bg2:#fff7fb; --card:#ffffff; --line:#f5d9e6;
+    --ink:#3d2033; --muted:#8a6b7d;
+    /* Rosa protagonista + pasteles de apoyo */
+    --pink:#ec4899; --pink-strong:#db2777; --pink-soft:#fbcfe8; --pink-mid:#f9a8d4;
+    --lav:#c4b5fd; --lav-soft:#ede9fe;
+    --mint:#6ee7b7; --mint-soft:#d1fae5;
+    --peach:#fdba74; --peach-soft:#ffedd5;
+    --sky:#93c5fd; --sky-soft:#dbeafe;
+    --lemon:#fde68a;
+    --ok:#059669; --warn:#d97706; --bad:#dc2626;
+    --shadow:0 10px 28px rgba(190,24,93,.09);
+    --shadow-lg:0 18px 44px rgba(190,24,93,.16);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(900px 500px at 8% -10%, #ffe4f1 0%, transparent 60%),
+      radial-gradient(800px 460px at 100% 0%, #f3e8ff 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 45%, #fff9fc 100%);
+    min-height:100vh;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:22px 20px 60px}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;overflow:hidden;border-radius:22px;padding:28px 30px;
+    background:linear-gradient(125deg,#fbcfe8 0%,#f9a8d4 42%,#f472b6 100%);
+    box-shadow:var(--shadow-lg);
+    display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;
+  }
+  .hero::after{
+    content:"";position:absolute;width:340px;height:340px;right:-90px;top:-140px;
+    background:radial-gradient(circle,rgba(255,255,255,.55),transparent 65%);border-radius:50%;
+  }
+  .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9d174d;opacity:.85}
+  .hero h1{margin:6px 0 0;font-size:clamp(22px,2.6vw,30px);letter-spacing:-.03em;color:#500724}
+  .hero p{margin:7px 0 0;font-size:13.5px;color:#7a2b4d}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+  .badge{
+    background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);
+    padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#831843;
+  }
+  .badge.ok{background:rgba(255,255,255,.92)}
+  .hero-kpi{position:relative;z-index:1;text-align:right;min-width:190px}
+  .hero-kpi .lbl{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9d174d;opacity:.85}
+  .hero-kpi b{display:block;font-size:clamp(26px,3vw,36px);letter-spacing:-.035em;color:#500724;margin:2px 0 2px;font-variant-numeric:tabular-nums}
+  .hero-kpi span.sub{font-size:12.5px;color:#7a2b4d}
+
+  /* ---------- Pestañas ---------- */
+  .tabs{
+    display:flex;gap:6px;margin:20px 0 0;padding:6px;border-radius:16px;
+    background:rgba(255,255,255,.75);border:1px solid var(--line);
+    box-shadow:var(--shadow);overflow-x:auto;position:sticky;top:10px;z-index:30;
+    backdrop-filter:blur(10px);
+  }
+  .tab{
+    flex:1 1 auto;white-space:nowrap;border:0;background:transparent;font-family:inherit;
+    font-size:13.5px;font-weight:700;color:var(--muted);padding:10px 18px;border-radius:11px;
+    cursor:pointer;transition:all .18s ease;
+  }
+  .tab:hover{color:var(--pink-strong);background:var(--pink-soft)}
+  .tab[aria-selected="true"]{
+    background:linear-gradient(135deg,#f472b6,#ec4899);color:#fff;
+    box-shadow:0 8px 20px rgba(236,72,153,.35);
+  }
+  .tab:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
+
+  /* ---------- Filtros ---------- */
+  .filters{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px;margin-top:16px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px 14px;align-items:end;
+  }
+  .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .field label{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .field select,.field input{
+    width:100%;padding:9px 11px;border-radius:11px;border:1px solid var(--line);
+    background:#fff8fc;color:var(--ink);font-size:13.5px;font-family:inherit;outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field select:focus,.field input:focus{
+    border-color:var(--pink-mid);box-shadow:0 0 0 3px rgba(244,114,182,.22);background:#fff;
+  }
+  .btn{
+    padding:9px 15px;border-radius:11px;border:1px solid var(--line);background:#fff;
+    font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;
+    transition:all .15s ease;white-space:nowrap;
+  }
+  .btn:hover{background:var(--pink-soft);border-color:var(--pink-mid);color:var(--pink-strong)}
+  .btn.primary{background:linear-gradient(135deg,#f472b6,#ec4899);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(236,72,153,.25)}
+  .btn.primary:hover{filter:brightness(1.04);color:#fff}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn:disabled:hover{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chip{
+    border:1px solid var(--pink-soft);background:#fff;color:#9d174d;border-radius:999px;
+    padding:6px 14px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;
+  }
+  .chip:hover{background:var(--pink-soft)}
+  .chip.active{background:linear-gradient(135deg,#f9a8d4,#f472b6);color:#fff;border-color:transparent}
+
+  /* ---------- Paneles ---------- */
+  .panel{display:none;animation:fade .28s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px}
+  .kpi{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .kpi::after{content:"";position:absolute;inset:auto 0 0 0;height:5px;background:linear-gradient(90deg,var(--pink-mid),var(--pink))}
+  .kpi.n2::after{background:linear-gradient(90deg,var(--lav),#a78bfa)}
+  .kpi.n3::after{background:linear-gradient(90deg,var(--mint),#34d399)}
+  .kpi.n4::after{background:linear-gradient(90deg,var(--peach),#fb923c)}
+  .kpi.n5::after{background:linear-gradient(90deg,var(--sky),#60a5fa)}
+  .kpi .t{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .kpi .v{font-size:clamp(22px,2.3vw,29px);font-weight:800;letter-spacing:-.03em;margin-top:7px;font-variant-numeric:tabular-nums}
+  .kpi .s{font-size:12.5px;color:var(--muted);margin-top:5px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  .grid.tri{grid-template-columns:1.2fr .8fr}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px 20px 20px;min-width:0;
+  }
+  .card h2{margin:0;font-size:15px;letter-spacing:-.01em;color:#4a1d33}
+  .card .sub{font-size:12px;color:var(--muted);margin:5px 0 14px}
+  .card.wide{grid-column:1/-1}
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+  /* ---------- Donut ---------- */
+  .donut-wrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .donut-wrap svg{flex:0 0 auto}
+  .donut-wrap circle.seg{transition:stroke-width .18s ease, opacity .18s ease;cursor:pointer}
+  .donut-wrap circle.seg:hover{stroke-width:42;opacity:.92}
+  .legend{display:flex;flex-direction:column;gap:9px;min-width:160px;flex:1}
+  .lg{display:flex;align-items:center;gap:9px;font-size:13px}
+  .lg .dot{width:11px;height:11px;border-radius:4px;flex:0 0 auto}
+  .lg .nm{font-weight:700}
+  .lg .vl{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12.5px;text-align:right}
+  .lg .vl b{color:var(--ink)}
+
+  /* ---------- Barras ---------- */
+  .bars{display:flex;flex-direction:column;gap:11px}
+  .bar-row{display:grid;grid-template-columns:minmax(92px,1.15fr) 2.2fr auto;gap:10px;align-items:center;font-size:13px}
+  .bar-row .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+  .bar-row .track{background:#fbe8f1;border-radius:999px;height:12px;overflow:hidden;display:block}
+  .bar-row .fill{
+    display:block;height:100%;border-radius:999px;
+    background:linear-gradient(90deg,#f9a8d4,#ec4899);
+    transition:width .45s cubic-bezier(.22,.61,.36,1), filter .15s;
+  }
+  .bar-row:hover .fill{filter:saturate(1.15) brightness(.97)}
+  .bar-row .val{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12.5px;min-width:76px;text-align:right}
+  .bar-row .val b{color:var(--ink)}
+  .bar-row.lav .fill{background:linear-gradient(90deg,#ddd6fe,#a78bfa)}
+  .bar-row.mint .fill{background:linear-gradient(90deg,#a7f3d0,#34d399)}
+  .bar-row.sky .fill{background:linear-gradient(90deg,#bfdbfe,#60a5fa)}
+  .bar-row.peach .fill{background:linear-gradient(90deg,#fed7aa,#fb923c)}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{
+    text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+    padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  td{padding:10px;border-bottom:1px solid #fce9f2;font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:#fff5fa}
+  td.name{font-weight:700}
+  #tablaVentas th{cursor:pointer;user-select:none;transition:color .15s,background .15s}
+  #tablaVentas th:hover{color:var(--pink-strong);background:#fff5fa}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+  .pill.pink{background:#fce7f3;color:#9d174d}
+  .pill.lav{background:#ede9fe;color:#5b21b6}
+  .pill.mint{background:#d1fae5;color:#065f46}
+  .pill.peach{background:#ffedd5;color:#9a3412}
+  .pill.sky{background:#dbeafe;color:#1e40af}
+  .pill.lemon{background:#fef3c7;color:#92400e}
+
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+  .pager .btn{padding:6px 12px;font-size:13px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .toolbar input{
+    flex:1 1 240px;padding:9px 13px;border-radius:11px;border:1px solid var(--line);
+    background:#fff8fc;font-family:inherit;font-size:13.5px;outline:none;
+  }
+  .toolbar input:focus{border-color:var(--pink-mid);box-shadow:0 0 0 3px rgba(244,114,182,.2)}
+  .toolbar .count{font-size:12.5px;color:var(--muted);font-weight:600}
+
+  /* ---------- Resumen / alertas ---------- */
+  .summary{
+    margin-top:16px;border-radius:var(--radius);padding:16px 20px;font-size:14px;line-height:1.65;
+    background:linear-gradient(120deg,#fdf2f8,#f3e8ff 55%,#fce7f3);
+    border:1px solid #f5cfe2;
+  }
+  .summary b{color:var(--pink-strong)}
+  .summary .tag{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#9d174d;display:block;margin-bottom:6px}
+
+  .alerts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+  .alert{
+    display:flex;align-items:center;gap:10px;background:#fff7ed;border:1px solid #fed7aa;
+    border-radius:13px;padding:10px 13px;font-size:13px;
+  }
+  .alert .ic{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#fdba74,#fb923c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px;flex:0 0 auto}
+  .alert .nm{font-weight:700}
+  .alert .st{color:#9a3412;font-size:12px}
+  .alert .num{margin-left:auto;font-weight:800;color:#9a3412;font-variant-numeric:tabular-nums}
+
+  .check{display:flex;flex-direction:column;gap:9px}
+  .chk{display:flex;align-items:center;gap:10px;font-size:13px;padding:9px 11px;border-radius:11px;background:#fff8fc;border:1px solid var(--line)}
+  .chk .mark{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;background:var(--ok);flex:0 0 auto}
+  .chk .mark.no{background:var(--bad)}
+  .chk .k{font-weight:600}
+  .chk .exp{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+  .chk .exp b{color:var(--ink)}
+
+  .segbtns{display:inline-flex;background:#fbe8f1;border-radius:11px;padding:4px;gap:4px}
+  .segbtn{border:0;background:transparent;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--muted);padding:6px 13px;border-radius:8px;cursor:pointer;transition:all .15s}
+  .segbtn:hover{color:var(--pink-strong)}
+  .segbtn.active{background:#fff;color:var(--pink-strong);box-shadow:0 3px 8px rgba(190,24,93,.14)}
+
+  .mini-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .mini{background:#fff8fc;border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+  .mini .t{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .mini .v{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+
+  .empty{color:var(--muted);font-size:13px;padding:16px 0;text-align:center}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
+
+  @media (max-width:900px){
+    .grid,.grid.tri{grid-template-columns:1fr}
+    .hero{padding:22px}
+    .hero-kpi{text-align:left}
+    .tabs{position:static}
+  }
+  @media print{
+    body{background:#fff}
+    .filters,.tabs,.toolbar,.btnrow,.segbtns{display:none!important}
+    .panel{display:block!important;break-inside:avoid}
+    .card,.kpi,.hero,.summary{box-shadow:none;border:1px solid var(--line)}
+    .hero{background:#fbcfe8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Distribuidora Andina Cía. Ltda.</div>
+      <h1>Dashboard de Ventas</h1>
+      <p>Primer semestre 2026 · datos incrustados en el archivo · funciona sin internet</p>
+      <div class="badges">
+        <span class="badge ok" id="badgeRows">110 ventas procesadas</span>
+        <span class="badge" id="badgePeriod">2026-01-05 → 2026-06-29</span>
+        <span class="badge">3 fuentes: ventas · productos · clientes</span>
+        <span class="badge">SVG/CSS nativo</span>
+      </div>
+    </div>
+    <div class="hero-kpi">
+      <span class="lbl">Total vendido</span>
+      <b id="liveTotal">—</b>
+      <span class="sub" id="liveSub">en la selección actual</span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones del dashboard">
+    <button class="tab" role="tab" id="tab-resumen"   aria-controls="panel-resumen"   aria-selected="true"  data-tab="resumen" tabindex="0">Resumen</button>
+    <button class="tab" role="tab" id="tab-canales"   aria-controls="panel-canales"   aria-selected="false" data-tab="canales" tabindex="-1">Canales</button>
+    <button class="tab" role="tab" id="tab-productos" aria-controls="panel-productos" aria-selected="false" data-tab="productos" tabindex="-1">Productos</button>
+    <button class="tab" role="tab" id="tab-clientes"  aria-controls="panel-clientes"  aria-selected="false" data-tab="clientes" tabindex="-1">Clientes</button>
+    <button class="tab" role="tab" id="tab-datos"     aria-controls="panel-datos"     aria-selected="false" data-tab="datos" tabindex="-1">Datos</button>
+  </nav>
+
+  <section class="filters" aria-label="Filtros globales">
+    <div class="field">
+      <label for="fCanal">Canal</label>
+      <select id="fCanal"><option value="">Todos los canales</option></select>
+    </div>
+    <div class="field">
+      <label for="fCategoria">Categoría</label>
+      <select id="fCategoria"><option value="">Todas las categorías</option></select>
+    </div>
+    <div class="field">
+      <label for="fCiudad">Ciudad del cliente</label>
+      <select id="fCiudad"><option value="">Todas las ciudades</option></select>
+    </div>
+    <div class="field">
+      <label for="fDesde">Desde</label>
+      <input type="date" id="fDesde" min="2026-01-05" max="2026-06-29">
+    </div>
+    <div class="field">
+      <label for="fHasta">Hasta</label>
+      <input type="date" id="fHasta" min="2026-01-05" max="2026-06-29">
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <div class="btnrow">
+        <button class="btn" id="btnReset" type="button">Limpiar</button>
+        <button class="btn primary" id="btnPrint" type="button">Imprimir / PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="chips" aria-label="Rangos rápidos">
+    <button class="chip active" data-from="" data-to="" type="button">Todo el semestre</button>
+    <button class="chip" data-from="2026-01-01" data-to="2026-03-31" type="button">1er trimestre</button>
+    <button class="chip" data-from="2026-04-01" data-to="2026-06-30" type="button">2do trimestre</button>
+    <button class="chip" data-from="2026-06-01" data-to="2026-06-30" type="button">Junio</button>
+  </div>
+
+  <main>
+    <!-- ================= RESUMEN ================= -->
+    <section class="panel active" id="panel-resumen" role="tabpanel" aria-labelledby="tab-resumen">
+      <section class="kpis" aria-label="Indicadores principales">
+        <div class="kpi">
+          <div class="t">Total vendido</div>
+          <div class="v" id="kTotal">—</div>
+          <div class="s" id="kTotalSub">—</div>
+        </div>
+        <div class="kpi n2">
+          <div class="t">N.º de ventas</div>
+          <div class="v" id="kCount">—</div>
+          <div class="s" id="kCountSub">—</div>
+        </div>
+        <div class="kpi n3">
+          <div class="t">Promedio por venta</div>
+          <div class="v" id="kAvg">—</div>
+          <div class="s" id="kAvgSub">—</div>
+        </div>
+        <div class="kpi n4">
+          <div class="t">Venta máxima</div>
+          <div class="v" id="kMax">—</div>
+          <div class="s" id="kMaxSub">—</div>
+        </div>
+        <div class="kpi n5">
+          <div class="t">Unidades vendidas</div>
+          <div class="v" id="kUnits">—</div>
+          <div class="s" id="kUnitsSub">—</div>
+        </div>
+      </section>
+
+      <div class="summary" aria-live="polite">
+        <span class="tag">Resumen automático</span>
+        <span id="summaryText">—</span>
+      </div>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Ventas por canal</h2>
+          <div class="sub" id="subCanal">Participación en el monto total vendido</div>
+          <div class="donut-wrap">
+            <div id="donutCanal"></div>
+            <div class="legend" id="legendCanal"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Ventas por categoría</h2>
+          <div class="sub" id="subCategoria">Cruce ventas ↔ productos</div>
+          <div class="bars" id="barsCategoria"></div>
+        </div>
+      </section>
+
+      <section class="grid tri">
+        <div class="card">
+          <h2>Top 5 productos por cantidad</h2>
+          <div class="sub" id="subTopProductos">Nombre real del producto</div>
+          <div class="bars" id="barsTopProductos"></div>
+        </div>
+        <div class="card">
+          <h2>Evolución mensual</h2>
+          <div class="sub" id="subMes">Monto vendido por mes (USD)</div>
+          <div id="chartMes"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= CANALES ================= -->
+    <section class="panel" id="panel-canales" role="tabpanel" aria-labelledby="tab-canales">
+      <section class="grid tri">
+        <div class="card">
+          <h2>Cómo se reparte el ingreso</h2>
+          <div class="sub" id="subCanal2">Participación de cada canal en el total</div>
+          <div class="donut-wrap">
+            <div id="donutCanal2"></div>
+            <div class="legend" id="legendCanal2"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Indicadores por canal</h2>
+          <div class="sub">Ventas, ingreso y ticket promedio</div>
+          <table>
+            <thead><tr><th>Canal</th><th style="text-align:right">Ventas</th><th style="text-align:right">Ingreso</th><th style="text-align:right">Ticket</th></tr></thead>
+            <tbody id="tbodyCanales"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Ingreso por vendedor</h2>
+          <div class="sub" id="subVendedores">Monto total vendido por persona</div>
+          <div class="bars" id="barsVendedores"></div>
+        </div>
+        <div class="card">
+          <h2>Número de ventas por canal</h2>
+          <div class="sub">Cuántas operaciones se cerraron en cada canal</div>
+          <div class="bars" id="barsCanalCount"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= PRODUCTOS ================= -->
+    <section class="panel" id="panel-productos" role="tabpanel" aria-labelledby="tab-productos">
+      <section class="grid">
+        <div class="card wide">
+          <div class="card-head">
+            <div>
+              <h2>Productos más vendidos</h2>
+              <div class="sub" id="subProductosTab">Cruce ventas ↔ productos por id_producto</div>
+            </div>
+            <div class="segbtns" role="group" aria-label="Métrica">
+              <button class="segbtn active" data-metric="monto" type="button">Monto ($)</button>
+              <button class="segbtn" data-metric="unidades" type="button">Unidades</button>
+            </div>
+          </div>
+          <div class="bars" id="barsProductos"></div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Detalle del top 5</h2>
+          <div class="sub">Cantidad, ingreso y categoría</div>
+          <table>
+            <thead><tr><th>Producto</th><th>Categoría</th><th style="text-align:right">Cant.</th><th style="text-align:right">Ingreso</th></tr></thead>
+            <tbody id="tbodyProductos"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h2>Alertas de stock</h2>
+          <div class="sub">Productos con stock por debajo de 300 unidades</div>
+          <div class="alerts" id="alertsStock"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= CLIENTES ================= -->
+    <section class="panel" id="panel-clientes" role="tabpanel" aria-labelledby="tab-clientes">
+      <section class="grid">
+        <div class="card">
+          <h2>Top 10 clientes por monto</h2>
+          <div class="sub" id="subClientes">Cruce ventas ↔ clientes por id_cliente</div>
+          <div class="bars" id="barsTopClientes"></div>
+        </div>
+        <div class="card">
+          <h2>Ventas por ciudad</h2>
+          <div class="sub">Ingreso generado por ciudad del cliente</div>
+          <div class="bars" id="barsCiudades"></div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Por tipo de cliente</h2>
+          <div class="sub">Mayorista, minorista y corporativo</div>
+          <div class="bars" id="barsTipos"></div>
+        </div>
+        <div class="card">
+          <h2>Concentración de la cartera</h2>
+          <div class="sub">Peso de los principales clientes sobre el total</div>
+          <div class="mini-kpis" id="miniClientes"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= DATOS ================= -->
+    <section class="panel" id="panel-datos" role="tabpanel" aria-labelledby="tab-datos">
+      <section class="grid">
+        <div class="card wide">
+          <h2>Detalle de ventas</h2>
+          <div class="sub" id="subTabla">110 registros · clic en un encabezado para ordenar</div>
+          <div class="toolbar">
+            <input type="search" id="qTabla" placeholder="Buscar por cliente, producto, ID o vendedor…" aria-label="Buscar en la tabla">
+            <button class="btn" id="btnExport" type="button">Exportar CSV</button>
+            <span class="count" id="countTabla">—</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table id="tablaVentas">
+              <thead>
+                <tr>
+                  <th data-sort="id_venta">ID</th>
+                  <th data-sort="fecha">Fecha</th>
+                  <th data-sort="cliente">Cliente</th>
+                  <th data-sort="producto">Producto</th>
+                  <th data-sort="canal">Canal</th>
+                  <th data-sort="vendedor">Vendedor</th>
+                  <th data-sort="cantidad" style="text-align:right">Cant.</th>
+                  <th data-sort="total" style="text-align:right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyVentas"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <button class="btn" id="prevPage" type="button">← Anterior</button>
+            <span id="pageInfo">—</span>
+            <button class="btn" id="nextPage" type="button">Siguiente →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Verificación de totales de control</h2>
+          <div class="sub">El dashboard se compara con el cálculo directo sobre ventas.csv</div>
+          <div class="check" id="checks"></div>
+        </div>
+        <div class="card">
+          <h2>Cobertura del dataset</h2>
+          <div class="sub">Filas procesadas de cada archivo</div>
+          <div class="mini-kpis" id="miniCoverage"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    Dashboard generado a partir de <b>ventas.csv</b> (110 filas), <b>productos.csv</b> (23) y <b>clientes.csv</b> (25).<br>
+    Los CSV de origen no fueron modificados · Funciona sin conexión · Distribuidora Andina Cía. Ltda. (datos ficticios)
+  </footer>
+</div>
+
+<script>
+const DATA = {"generado":"2026-11-14 16:17","ventas":[{"id_venta":"V0060","fecha":"2026-01-05","id_cliente":"C017","id_producto":"P023","cantidad":"2","precio_unitario":"0.85","descuento":"0.00","total":"1.70","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0090","fecha":"2026-01-06","id_cliente":"C012","id_producto":"P007","cantidad":"10","precio_unitario":"1.40","descuento":"0.00","total":"14.00","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0044","fecha":"2026-01-11","id_cliente":"C018","id_producto":"P020","cantidad":"15","precio_unitario":"2.85","descuento":"2.14","total":"40.61","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0024","fecha":"2026-01-12","id_cliente":"C003","id_producto":"P017","cantidad":"4","precio_unitario":"2.60","descuento":"0.00","total":"10.40","canal":"Presencial","vendedor":"Luis Paredes"},{"id_venta":"V0023","fecha":"2026-01-14","id_cliente":"C010","id_producto":"P018","cantidad":"30","precio_unitario":"0.95","descuento":"2.85","total":"25.65","canal":"Presencial","vendedor":"Carla Suntaxi"},{"id_venta":"V0104","fecha":"2026-01-14","id_cliente":"C008","id_producto":"P015","cantidad":"10","precio_unitario":"6.50","descuento":"0.00","total":"65.00","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0049","fecha":"2026-01-15","id_cliente":"C009","id_producto":"P016","cantidad":"15","precio_unitario":"4.80","descuento":"3.60","total":"68.40","canal":"Presencial","vendedor":"Luis Paredes"},{"id_venta":"V0028","fecha":"2026-01-17","id_cliente":"C011","id_producto":"P006","cantidad":"8","precio_unitario":"1.75","descuento":"2.10","total":"11.90","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0022","fecha":"2026-01-18","id_cliente":"C020","id_producto":"P012","cantidad":"8","precio_unitario":"2.95","descuento":"1.18","total":"22.42","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0037","fecha":"2026-01-18","id_cliente":"C008","id_producto":"P002","cantidad":"30","precio_unitario":"1.85","descuento":"5.55","total":"49.95","canal":"Presencial","vendedor":"Maribel Cajas"},{"id_venta":"V0048","fecha":"2026-01-18","id_cliente":"C017","id_producto":"P010","cantidad":"24","precio_unitario":"5.80","descuento":"6.96","total":"132.24","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0087","fecha":"2026-01-18","id_cliente":"C005","id_producto":"P007","cantidad":"6","precio_unitario":"1.40","descuento":"1.26","total":"7.14","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0103","fecha":"2026-01-19","id_cliente":"C008","id_producto":"P003","cantidad":"24","precio_unitario":"2.10","descuento":"2.52","total":"47.88","canal":"Online","vendedor":"Ana Morales"},{"id_venta":"V0074","fecha":"2026-01-20","id_cliente":"C006","id_producto":"P001","cantidad":"6","precio_unitario":"0.60","descuento":"0.00","total":"3.60","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0101","fecha":"2026-01-20","id_cliente":"C008","id_producto":"P018","cantidad":"15","precio_unitario":"0.95","descuento":"0.00","total":"14.25","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0004","fecha":"2026-01-23","id_cliente":"C009","id_producto":"P019","cantidad":"10","precio_unitario":"1.15","descuento":"0.58","total":"10.92","canal":"Presencial","vendedor":"Carla Suntaxi"},{"id_venta":"V0078","fecha":"2026-01-23","id_cliente":"C017","id_producto":"P011","cantidad":"10","precio_unitario":"3.40","descuento":"5.10","total":"28.90","canal":"Online","vendedor":"Ana Morales"},{"id_venta":"V0106","fecha":"2026-01-24","id_cliente":"C018","id_producto":"P022","cantidad":"30","precio_unitario":"0.90","descuento":"0.00","total":"27.00","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0026","fecha":"2026-01-26","id_cliente":"C008","id_producto":"P021","cantidad":"24","precio_unitario":"1.60","descuento":"1.92","total":"36.48","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0017","fecha":"2026-01-28","id_cliente":"C019","id_producto":"P002","cantidad":"6","precio_unitario":"1.85","descuento":"1.11","total":"9.99","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0057","fecha":"2026-01-28","id_cliente":"C023","id_producto":"P011","cantidad":"3","precio_unitario":"3.40","descuento":"0.00","total":"10.20","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0040","fecha":"2026-01-30","id_cliente":"C021","id_producto":"P004","cantidad":"4","precio_unitario":"4.50","descuento":"0.00","total":"18.00","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0093","fecha":"2026-01-30","id_cliente":"C016","id_producto":"P017","cantidad":"20","precio_unitario":"2.60","descuento":"0.00","total":"52.00","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0077","fecha":"2026-02-01","id_cliente":"C008","id_producto":"P002","cantidad":"15","precio_unitario":"1.85","descuento":"0.00","total":"27.75","canal":"Presencial","vendedor":"Maribel Cajas"},{"id_venta":"V0108","fecha":"2026-02-05","id_cliente":"C012","id_producto":"P013","cantidad":"5","precio_unitario":"1.30","descuento":"0.00","total":"6.50","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0009","fecha":"2026-02-08","id_cliente":"C008","id_producto":"P012","cantidad":"2","precio_unitario":"2.95","descuento":"0.59","total":"5.31","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0055","fecha":"2026-02-08","id_cliente":"C020","id_producto":"P012","cantidad":"20","precio_unitario":"2.95","descuento":"0.00","total":"59.00","canal":"Online","vendedor":"Ana Morales"},{"id_venta":"V0021","fecha":"2026-02-10","id_cliente":"C015","id_producto":"P019","cantidad":"24","precio_unitario":"1.15","descuento":"1.38","total":"26.22","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0110","fecha":"2026-02-13","id_cliente":"C001","id_producto":"P020","cantidad":"6","precio_unitario":"2.85","descuento":"0.86","total":"16.24","canal":"Presencial","vendedor":"Carla Suntaxi"},{"id_venta":"V0045","fecha":"2026-02-19","id_cliente":"C006","id_producto":"P005","cantidad":"20","precio_unitario":"3.20","descuento":"0.00","total":"64.00","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0047","fecha":"2026-02-20","id_cliente":"C020","id_producto":"P023","cantidad":"24","precio_unitario":"0.85","descuento":"1.02","total":"19.38","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0082","fecha":"2026-02-20","id_cliente":"C014","id_producto":"P016","cantidad":"8","precio_unitario":"4.80","descuento":"5.76","total":"32.64","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0100","fecha":"2026-02-20","id_cliente":"C003","id_producto":"P011","cantidad":"2","precio_unitario":"3.40","descuento":"0.00","total":"6.80","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0068","fecha":"2026-02-21","id_cliente":"C020","id_producto":"P003","cantidad":"10","precio_unitario":"2.10","descuento":"3.15","total":"17.85","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0076","fecha":"2026-02-22","id_cliente":"C002","id_producto":"P016","cantidad":"15","precio_unitario":"4.80","descuento":"10.80","total":"61.20","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0085","fecha":"2026-02-22","id_cliente":"C006","id_producto":"P008","cantidad":"5","precio_unitario":"1.25","descuento":"0.94","total":"5.31","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0099","fecha":"2026-02-24","id_cliente":"C020","id_producto":"P018","cantidad":"3","precio_unitario":"0.95","descuento":"0.00","total":"2.85","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0036","fecha":"2026-02-25","id_cliente":"C006","id_producto":"P016","cantidad":"4","precio_unitario":"4.80","descuento":"1.92","total":"17.28","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0008","fecha":"2026-02-27","id_cliente":"C008","id_producto":"P015","cantidad":"15","precio_unitario":"6.50","descuento":"4.88","total":"92.62","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0041","fecha":"2026-02-27","id_cliente":"C025","id_producto":"P011","cantidad":"15","precio_unitario":"3.40","descuento":"5.10","total":"45.90","canal":"Presencial","vendedor":"Maribel Cajas"},{"id_venta":"V0019","fecha":"2026-02-28","id_cliente":"C012","id_producto":"P023","cantidad":"15","precio_unitario":"0.85","descuento":"0.00","total":"12.75","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0018","fecha":"2026-03-01","id_cliente":"C003","id_producto":"P004","cantidad":"6","precio_unitario":"4.50","descuento":"2.70","total":"24.30","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0061","fecha":"2026-03-01","id_cliente":"C002","id_producto":"P017","cantidad":"2","precio_unitario":"2.60","descuento":"0.78","total":"4.42","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0089","fecha":"2026-03-04","id_cliente":"C017","id_producto":"P022","cantidad":"6","precio_unitario":"0.90","descuento":"0.00","total":"5.40","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0080","fecha":"2026-03-05","id_cliente":"C012","id_producto":"P011","cantidad":"8","precio_unitario":"3.40","descuento":"0.00","total":"27.20","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0091","fecha":"2026-03-06","id_cliente":"C003","id_producto":"P007","cantidad":"4","precio_unitario":"1.40","descuento":"0.56","total":"5.04","canal":"Online","vendedor":"Maribel Cajas"},{"id_venta":"V0031","fecha":"2026-03-12","id_cliente":"C007","id_producto":"P008","cantidad":"20","precio_unitario":"1.25","descuento":"3.75","total":"21.25","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0062","fecha":"2026-03-12","id_cliente":"C016","id_producto":"P020","cantidad":"2","precio_unitario":"2.85","descuento":"0.29","total":"5.41","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0034","fecha":"2026-03-13","id_cliente":"C007","id_producto":"P018","cantidad":"2","precio_unitario":"0.95","descuento":"0.10","total":"1.80","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0003","fecha":"2026-03-16","id_cliente":"C010","id_producto":"P018","cantidad":"2","precio_unitario":"0.95","descuento":"0.00","total":"1.90","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0073","fecha":"2026-03-17","id_cliente":"C013","id_producto":"P012","cantidad":"10","precio_unitario":"2.95","descuento":"1.48","total":"28.02","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0084","fecha":"2026-03-20","id_cliente":"C006","id_producto":"P002","cantidad":"6","precio_unitario":"1.85","descuento":"0.56","total":"10.54","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0013","fecha":"2026-03-21","id_cliente":"C018","id_producto":"P017","cantidad":"24","precio_unitario":"2.60","descuento":"0.00","total":"62.40","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0038","fecha":"2026-03-21","id_cliente":"C005","id_producto":"P002","cantidad":"2","precio_unitario":"1.85","descuento":"0.19","total":"3.51","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0094","fecha":"2026-03-22","id_cliente":"C012","id_producto":"P005","cantidad":"8","precio_unitario":"3.20","descuento":"0.00","total":"25.60","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0005","fecha":"2026-03-24","id_cliente":"C004","id_producto":"P001","cantidad":"6","precio_unitario":"0.60","descuento":"0.18","total":"3.42","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0015","fecha":"2026-03-31","id_cliente":"C003","id_producto":"P023","cantidad":"2","precio_unitario":"0.85","descuento":"0.26","total":"1.44","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0020","fecha":"2026-04-01","id_cliente":"C021","id_producto":"P009","cantidad":"2","precio_unitario":"1.10","descuento":"0.11","total":"2.09","canal":"Online","vendedor":"Maribel Cajas"},{"id_venta":"V0075","fecha":"2026-04-04","id_cliente":"C011","id_producto":"P003","cantidad":"24","precio_unitario":"2.10","descuento":"0.00","total":"50.40","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0097","fecha":"2026-04-06","id_cliente":"C010","id_producto":"P018","cantidad":"20","precio_unitario":"0.95","descuento":"2.85","total":"16.15","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0016","fecha":"2026-04-07","id_cliente":"C023","id_producto":"P022","cantidad":"3","precio_unitario":"0.90","descuento":"0.27","total":"2.43","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0105","fecha":"2026-04-08","id_cliente":"C022","id_producto":"P001","cantidad":"30","precio_unitario":"0.60","descuento":"0.90","total":"17.10","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0002","fecha":"2026-04-11","id_cliente":"C006","id_producto":"P023","cantidad":"3","precio_unitario":"0.85","descuento":"0.00","total":"2.55","canal":"Presencial","vendedor":"Luis Paredes"},{"id_venta":"V0039","fecha":"2026-04-11","id_cliente":"C023","id_producto":"P020","cantidad":"24","precio_unitario":"2.85","descuento":"3.42","total":"64.98","canal":"Presencial","vendedor":"Carla Suntaxi"},{"id_venta":"V0052","fecha":"2026-04-12","id_cliente":"C025","id_producto":"P014","cantidad":"30","precio_unitario":"2.20","descuento":"9.90","total":"56.10","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0053","fecha":"2026-04-15","id_cliente":"C011","id_producto":"P001","cantidad":"8","precio_unitario":"0.60","descuento":"0.00","total":"4.80","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0011","fecha":"2026-04-20","id_cliente":"C006","id_producto":"P019","cantidad":"30","precio_unitario":"1.15","descuento":"1.73","total":"32.77","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0092","fecha":"2026-04-22","id_cliente":"C009","id_producto":"P006","cantidad":"20","precio_unitario":"1.75","descuento":"1.75","total":"33.25","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0042","fecha":"2026-04-23","id_cliente":"C011","id_producto":"P018","cantidad":"4","precio_unitario":"0.95","descuento":"0.57","total":"3.23","canal":"Telefono","vendedor":"Ana Morales"},{"id_venta":"V0059","fecha":"2026-04-24","id_cliente":"C005","id_producto":"P013","cantidad":"4","precio_unitario":"1.30","descuento":"0.00","total":"5.20","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0079","fecha":"2026-04-26","id_cliente":"C025","id_producto":"P018","cantidad":"20","precio_unitario":"0.95","descuento":"0.00","total":"19.00","canal":"Online","vendedor":"Ana Morales"},{"id_venta":"V0083","fecha":"2026-04-26","id_cliente":"C012","id_producto":"P022","cantidad":"12","precio_unitario":"0.90","descuento":"0.54","total":"10.26","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0010","fecha":"2026-04-30","id_cliente":"C012","id_producto":"P018","cantidad":"24","precio_unitario":"0.95","descuento":"0.00","total":"22.80","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0046","fecha":"2026-04-30","id_cliente":"C003","id_producto":"P011","cantidad":"5","precio_unitario":"3.40","descuento":"0.00","total":"17.00","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0007","fecha":"2026-05-02","id_cliente":"C003","id_producto":"P020","cantidad":"5","precio_unitario":"2.85","descuento":"0.00","total":"14.25","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0086","fecha":"2026-05-03","id_cliente":"C019","id_producto":"P016","cantidad":"30","precio_unitario":"4.80","descuento":"7.20","total":"136.80","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0063","fecha":"2026-05-07","id_cliente":"C004","id_producto":"P017","cantidad":"24","precio_unitario":"2.60","descuento":"6.24","total":"56.16","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0050","fecha":"2026-05-09","id_cliente":"C013","id_producto":"P005","cantidad":"12","precio_unitario":"3.20","descuento":"1.92","total":"36.48","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0107","fecha":"2026-05-15","id_cliente":"C012","id_producto":"P017","cantidad":"15","precio_unitario":"2.60","descuento":"3.90","total":"35.10","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0098","fecha":"2026-05-16","id_cliente":"C018","id_producto":"P010","cantidad":"24","precio_unitario":"5.80","descuento":"0.00","total":"139.20","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0066","fecha":"2026-05-18","id_cliente":"C003","id_producto":"P013","cantidad":"3","precio_unitario":"1.30","descuento":"0.20","total":"3.70","canal":"Presencial","vendedor":"Luis Paredes"},{"id_venta":"V0070","fecha":"2026-05-18","id_cliente":"C012","id_producto":"P022","cantidad":"20","precio_unitario":"0.90","descuento":"0.00","total":"18.00","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0001","fecha":"2026-05-22","id_cliente":"C014","id_producto":"P016","cantidad":"20","precio_unitario":"4.80","descuento":"0.00","total":"96.00","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0030","fecha":"2026-05-26","id_cliente":"C021","id_producto":"P011","cantidad":"10","precio_unitario":"3.40","descuento":"0.00","total":"34.00","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0102","fecha":"2026-05-26","id_cliente":"C011","id_producto":"P020","cantidad":"8","precio_unitario":"2.85","descuento":"1.14","total":"21.66","canal":"Presencial","vendedor":"Maribel Cajas"},{"id_venta":"V0054","fecha":"2026-05-27","id_cliente":"C006","id_producto":"P021","cantidad":"10","precio_unitario":"1.60","descuento":"0.80","total":"15.20","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0067","fecha":"2026-05-27","id_cliente":"C002","id_producto":"P008","cantidad":"6","precio_unitario":"1.25","descuento":"0.38","total":"7.12","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0033","fecha":"2026-05-29","id_cliente":"C023","id_producto":"P011","cantidad":"5","precio_unitario":"3.40","descuento":"0.00","total":"17.00","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0051","fecha":"2026-05-30","id_cliente":"C004","id_producto":"P011","cantidad":"4","precio_unitario":"3.40","descuento":"0.00","total":"13.60","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0095","fecha":"2026-05-30","id_cliente":"C015","id_producto":"P020","cantidad":"12","precio_unitario":"2.85","descuento":"1.71","total":"32.49","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0025","fecha":"2026-05-31","id_cliente":"C022","id_producto":"P014","cantidad":"5","precio_unitario":"2.20","descuento":"0.00","total":"11.00","canal":"Presencial","vendedor":"Carla Suntaxi"},{"id_venta":"V0065","fecha":"2026-05-31","id_cliente":"C021","id_producto":"P018","cantidad":"24","precio_unitario":"0.95","descuento":"3.42","total":"19.38","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0035","fecha":"2026-06-02","id_cliente":"C001","id_producto":"P011","cantidad":"20","precio_unitario":"3.40","descuento":"10.20","total":"57.80","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0109","fecha":"2026-06-04","id_cliente":"C023","id_producto":"P007","cantidad":"30","precio_unitario":"1.40","descuento":"0.00","total":"42.00","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0096","fecha":"2026-06-05","id_cliente":"C015","id_producto":"P002","cantidad":"24","precio_unitario":"1.85","descuento":"0.00","total":"44.40","canal":"Telefono","vendedor":"Carla Suntaxi"},{"id_venta":"V0064","fecha":"2026-06-08","id_cliente":"C002","id_producto":"P010","cantidad":"24","precio_unitario":"5.80","descuento":"0.00","total":"139.20","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0006","fecha":"2026-06-11","id_cliente":"C021","id_producto":"P014","cantidad":"6","precio_unitario":"2.20","descuento":"0.00","total":"13.20","canal":"Telefono","vendedor":"Diego Andrade"},{"id_venta":"V0027","fecha":"2026-06-12","id_cliente":"C017","id_producto":"P018","cantidad":"2","precio_unitario":"0.95","descuento":"0.10","total":"1.80","canal":"Presencial","vendedor":"Ana Morales"},{"id_venta":"V0012","fecha":"2026-06-14","id_cliente":"C012","id_producto":"P004","cantidad":"3","precio_unitario":"4.50","descuento":"0.00","total":"13.50","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0014","fecha":"2026-06-15","id_cliente":"C004","id_producto":"P002","cantidad":"3","precio_unitario":"1.85","descuento":"0.28","total":"5.27","canal":"Presencial","vendedor":"Maribel Cajas"},{"id_venta":"V0072","fecha":"2026-06-15","id_cliente":"C016","id_producto":"P023","cantidad":"30","precio_unitario":"0.85","descuento":"0.00","total":"25.50","canal":"Telefono","vendedor":"Luis Paredes"},{"id_venta":"V0088","fecha":"2026-06-16","id_cliente":"C012","id_producto":"P002","cantidad":"10","precio_unitario":"1.85","descuento":"0.00","total":"18.50","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0058","fecha":"2026-06-17","id_cliente":"C021","id_producto":"P016","cantidad":"8","precio_unitario":"4.80","descuento":"0.00","total":"38.40","canal":"Presencial","vendedor":"Luis Paredes"},{"id_venta":"V0043","fecha":"2026-06-19","id_cliente":"C003","id_producto":"P002","cantidad":"2","precio_unitario":"1.85","descuento":"0.19","total":"3.51","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0069","fecha":"2026-06-20","id_cliente":"C011","id_producto":"P006","cantidad":"20","precio_unitario":"1.75","descuento":"5.25","total":"29.75","canal":"Online","vendedor":"Carla Suntaxi"},{"id_venta":"V0032","fecha":"2026-06-22","id_cliente":"C010","id_producto":"P011","cantidad":"10","precio_unitario":"3.40","descuento":"5.10","total":"28.90","canal":"Presencial","vendedor":"Diego Andrade"},{"id_venta":"V0029","fecha":"2026-06-24","id_cliente":"C001","id_producto":"P004","cantidad":"2","precio_unitario":"4.50","descuento":"0.00","total":"9.00","canal":"Telefono","vendedor":"Maribel Cajas"},{"id_venta":"V0081","fecha":"2026-06-24","id_cliente":"C007","id_producto":"P017","cantidad":"2","precio_unitario":"2.60","descuento":"0.00","total":"5.20","canal":"Online","vendedor":"Luis Paredes"},{"id_venta":"V0071","fecha":"2026-06-28","id_cliente":"C010","id_producto":"P011","cantidad":"6","precio_unitario":"3.40","descuento":"2.04","total":"18.36","canal":"Online","vendedor":"Diego Andrade"},{"id_venta":"V0056","fecha":"2026-06-29","id_cliente":"C002","id_producto":"P002","cantidad":"15","precio_unitario":"1.85","descuento":"0.00","total":"27.75","canal":"Online","vendedor":"Luis Paredes"}],"productos":[{"id_producto":"P001","nombre":"Agua Mineral 500 ml","categoria":"Bebidas","unidad_medida":"Botella","precio_unitario":"0.6","costo_unitario":"0.38","stock_actual":"1200","proveedor":"Aquarel S.A.","estado":"Activo"},{"id_producto":"P002","nombre":"Jugo de Naranja 1 L","categoria":"Bebidas","unidad_medida":"Botella","precio_unitario":"1.85","costo_unitario":"1.15","stock_actual":"480","proveedor":"Frutalec Cia. Ltda.","estado":"Activo"},{"id_producto":"P003","nombre":"Gaseosa Cola 3 L","categoria":"Bebidas","unidad_medida":"Botella","precio_unitario":"2.1","costo_unitario":"1.3","stock_actual":"650","proveedor":"Bebidas del Valle","estado":"Activo"},{"id_producto":"P004","nombre":"Cafe Molido 500 g","categoria":"Bebidas","unidad_medida":"Funda","precio_unitario":"4.5","costo_unitario":"3.05","stock_actual":"300","proveedor":"Andina Cafe","estado":"Activo"},{"id_producto":"P005","nombre":"Te Verde Caja 25","categoria":"Bebidas","unidad_medida":"Caja","precio_unitario":"3.2","costo_unitario":"2.0","stock_actual":"220","proveedor":"Herbarium","estado":"Activo"},{"id_producto":"P006","nombre":"Bebida Energizante 500 ml","categoria":"Bebidas","unidad_medida":"Botella","precio_unitario":"1.75","costo_unitario":"1.05","stock_actual":"540","proveedor":"Energix","estado":"Activo"},{"id_producto":"P007","nombre":"Galletas de Chocolate 250 g","categoria":"Snacks","unidad_medida":"Paquete","precio_unitario":"1.4","costo_unitario":"0.85","stock_actual":"700","proveedor":"Dulces del Sur","estado":"Activo"},{"id_producto":"P008","nombre":"Papas Fritas 180 g","categoria":"Snacks","unidad_medida":"Paquete","precio_unitario":"1.25","costo_unitario":"0.72","stock_actual":"820","proveedor":"Crocantex","estado":"Activo"},{"id_producto":"P009","nombre":"Mani Salado 200 g","categoria":"Snacks","unidad_medida":"Funda","precio_unitario":"1.1","costo_unitario":"0.65","stock_actual":"460","proveedor":"Crocantex","estado":"Activo"},{"id_producto":"P010","nombre":"Barritas de Cereal caja 12","categoria":"Snacks","unidad_medida":"Caja","precio_unitario":"5.8","costo_unitario":"3.9","stock_actual":"180","proveedor":"NutriAndes","estado":"Activo"},{"id_producto":"P011","nombre":"Detergente en Polvo 1 kg","categoria":"Limpieza","unidad_medida":"Funda","precio_unitario":"3.4","costo_unitario":"2.15","stock_actual":"390","proveedor":"LimpioMax","estado":"Activo"},{"id_producto":"P012","nombre":"Jabon Liquido 1 L","categoria":"Limpieza","unidad_medida":"Botella","precio_unitario":"2.95","costo_unitario":"1.7","stock_actual":"350","proveedor":"LimpioMax","estado":"Activo"},{"id_producto":"P013","nombre":"Cloro 1 L","categoria":"Limpieza","unidad_medida":"Botella","precio_unitario":"1.3","costo_unitario":"0.68","stock_actual":"500","proveedor":"Quimicos Andinos","estado":"Activo"},{"id_producto":"P014","nombre":"Limpiador Multiuso 750 ml","categoria":"Limpieza","unidad_medida":"Botella","precio_unitario":"2.2","costo_unitario":"1.25","stock_actual":"410","proveedor":"Quimicos Andinos","estado":"Activo"},{"id_producto":"P015","nombre":"Papel Higienico 12 rollos","categoria":"Limpieza","unidad_medida":"Paquete","precio_unitario":"6.5","costo_unitario":"4.2","stock_actual":"260","proveedor":"Papelera Nacional","estado":"Activo"},{"id_producto":"P016","nombre":"Shampoo 750 ml","categoria":"Cuidado Personal","unidad_medida":"Botella","precio_unitario":"4.8","costo_unitario":"3.1","stock_actual":"240","proveedor":"Belleza Andina","estado":"Activo"},{"id_producto":"P017","nombre":"Pasta Dental 100 ml","categoria":"Cuidado Personal","unidad_medida":"Tubo","precio_unitario":"2.6","costo_unitario":"1.45","stock_actual":"380","proveedor":"Belleza Andina","estado":"Activo"},{"id_producto":"P018","nombre":"Jabon de Tocador barra","categoria":"Cuidado Personal","unidad_medida":"Unidad","precio_unitario":"0.95","costo_unitario":"0.5","stock_actual":"620","proveedor":"Belleza Andina","estado":"Activo"},{"id_producto":"P019","nombre":"Arroz 1 kg","categoria":"Despensa","unidad_medida":"Funda","precio_unitario":"1.15","costo_unitario":"0.8","stock_actual":"900","proveedor":"Granos del Litoral","estado":"Activo"},{"id_producto":"P020","nombre":"Aceite de Girasol 1 L","categoria":"Despensa","unidad_medida":"Botella","precio_unitario":"2.85","costo_unitario":"2.05","stock_actual":"430","proveedor":"Oleaginosas Andinas","estado":"Activo"},{"id_producto":"P021","nombre":"Atun en Lata 170 g","categoria":"Despensa","unidad_medida":"Lata","precio_unitario":"1.6","costo_unitario":"1.05","stock_actual":"700","proveedor":"Mar Andino","estado":"Activo"},{"id_producto":"P022","nombre":"Azucar 1 kg","categoria":"Despensa","unidad_medida":"Funda","precio_unitario":"0.9","costo_unitario":"0.62","stock_actual":"850","proveedor":"Ingenio del Valle","estado":"Activo"},{"id_producto":"P023","nombre":"Fideos 500 g","categoria":"Despensa","unidad_medida":"Paquete","precio_unitario":"0.85","costo_unitario":"0.52","stock_actual":"760","proveedor":"Molinos Andinos","estado":"Activo"}],"clientes":[{"id_cliente":"C001","nombre":"Supermercado El Ahorro","tipo_cliente":"Mayorista","ciudad":"Quito","fecha_alta":"2021-03-15","correo":"contacto@elahorro.com.ec","telefono":"02-245-1180","estado":"Activo"},{"id_cliente":"C002","nombre":"Tienda Dona Rosa","tipo_cliente":"Minorista","ciudad":"Quito","fecha_alta":"2022-07-02","correo":"ventas@tiendadorarosa.ec","telefono":"02-266-9043","estado":"Activo"},{"id_cliente":"C003","nombre":"Distribuidora Costa Sur","tipo_cliente":"Mayorista","ciudad":"Guayaquil","fecha_alta":"2020-11-20","correo":"compras@costasur.com.ec","telefono":"04-238-7712","estado":"Activo"},{"id_cliente":"C004","nombre":"Mini Market La Esquina","tipo_cliente":"Minorista","ciudad":"Guayaquil","fecha_alta":"2023-01-18","correo":"laesquina@correo.ec","telefono":"04-251-3390","estado":"Activo"},{"id_cliente":"C005","nombre":"Hotel Vista Andina","tipo_cliente":"Corporativo","ciudad":"Cuenca","fecha_alta":"2021-09-05","correo":"abastecimiento@vistaandina.ec","telefono":"07-283-4455","estado":"Activo"},{"id_cliente":"C006","nombre":"Restaurante El Sabor Cuencano","tipo_cliente":"Minorista","ciudad":"Cuenca","fecha_alta":"2022-05-23","correo":"reservas@saborcuencano.ec","telefono":"07-281-9021","estado":"Activo"},{"id_cliente":"C007","nombre":"Corporativo Textil Ambato","tipo_cliente":"Corporativo","ciudad":"Ambato","fecha_alta":"2020-06-12","correo":"compras@textilambato.ec","telefono":"03-242-6678","estado":"Activo"},{"id_cliente":"C008","nombre":"Distribuidora Tungurahua","tipo_cliente":"Mayorista","ciudad":"Ambato","fecha_alta":"2021-12-01","correo":"ventas@distritungurahua.ec","telefono":"03-240-1188","estado":"Inactivo"},{"id_cliente":"C009","nombre":"Comercial Manta Express","tipo_cliente":"Mayorista","ciudad":"Manta","fecha_alta":"2022-02-14","correo":"pedidos@mantaexpress.ec","telefono":"05-262-3344","estado":"Activo"},{"id_cliente":"C010","nombre":"Cafeteria Puerto Azul","tipo_cliente":"Minorista","ciudad":"Manta","fecha_alta":"2023-04-07","correo":"administracion@puertoazul.ec","telefono":"05-261-7788","estado":"Activo"},{"id_cliente":"C011","nombre":"Bodega Loja Central","tipo_cliente":"Mayorista","ciudad":"Loja","fecha_alta":"2021-08-19","correo":"bodegaloja@correo.ec","telefono":"07-257-2211","estado":"Activo"},{"id_cliente":"C012","nombre":"Farmacia San Sebastian","tipo_cliente":"Minorista","ciudad":"Loja","fecha_alta":"2022-10-30","correo":"fsansebastian@correo.ec","telefono":"07-258-9045","estado":"Activo"},{"id_cliente":"C013","nombre":"Supermercado Machala Real","tipo_cliente":"Mayorista","ciudad":"Machala","fecha_alta":"2020-04-25","correo":"compras@machalarreal.ec","telefono":"07-293-1166","estado":"Activo"},{"id_cliente":"C014","nombre":"Panaderia El Trigal","tipo_cliente":"Minorista","ciudad":"Riobamba","fecha_alta":"2023-06-11","correo":"eltrigal@correo.ec","telefono":"03-296-5522","estado":"Activo"},{"id_cliente":"C015","nombre":"Distribuidora Centro Andina","tipo_cliente":"Mayorista","ciudad":"Riobamba","fecha_alta":"2022-03-09","correo":"ventas@centroandina.ec","telefono":"03-295-7788","estado":"Activo"},{"id_cliente":"C016","nombre":"Comisariato Portoviejo","tipo_cliente":"Mayorista","ciudad":"Portoviejo","fecha_alta":"2021-01-27","correo":"compras@comisariatopp.ec","telefono":"05-263-4400","estado":"Activo"},{"id_cliente":"C017","nombre":"Tienda La Manabita","tipo_cliente":"Minorista","ciudad":"Portoviejo","fecha_alta":"2023-09-14","correo":"lamanabita@correo.ec","telefono":"05-264-9911","estado":"Activo"},{"id_cliente":"C018","nombre":"Supermercado Santo Domingo","tipo_cliente":"Mayorista","ciudad":"Santo Domingo","fecha_alta":"2020-12-08","correo":"compras@supersto.ec","telefono":"02-375-2200","estado":"Activo"},{"id_cliente":"C019","nombre":"Restaurante La Cascada","tipo_cliente":"Minorista","ciudad":"Santo Domingo","fecha_alta":"2022-11-16","correo":"lacascada@correo.ec","telefono":"02-376-8833","estado":"Activo"},{"id_cliente":"C020","nombre":"Comercial Ibarra Norte","tipo_cliente":"Mayorista","ciudad":"Ibarra","fecha_alta":"2021-05-04","correo":"ventas@ibarrnorte.ec","telefono":"06-264-5566","estado":"Inactivo"},{"id_cliente":"C021","nombre":"Hotel Salinas Beach","tipo_cliente":"Corporativo","ciudad":"Salinas","fecha_alta":"2022-08-22","correo":"abastecimiento@salinasbeach.ec","telefono":"04-277-4400","estado":"Activo"},{"id_cliente":"C022","nombre":"Minimarket Cuenca Sur","tipo_cliente":"Minorista","ciudad":"Cuenca","fecha_alta":"2023-02-28","correo":"cuencasur@correo.ec","telefono":"07-286-3344","estado":"Activo"},{"id_cliente":"C023","nombre":"Distribuidora Guayas","tipo_cliente":"Mayorista","ciudad":"Guayaquil","fecha_alta":"2020-09-17","correo":"pedidos@distriguayas.ec","telefono":"04-229-6677","estado":"Activo"},{"id_cliente":"C024","nombre":"Tienda Familiar Quito Norte","tipo_cliente":"Minorista","ciudad":"Quito","fecha_alta":"2023-07-05","correo":"familiarqtn@correo.ec","telefono":"02-248-7700","estado":"Activo"},{"id_cliente":"C025","nombre":"Abastos del Austro","tipo_cliente":"Mayorista","ciudad":"Cuenca","fecha_alta":"2021-10-13","correo":"ventas@abastosaustro.ec","telefono":"07-284-1199","estado":"Activo"}]};
+
+/* ---------- utilidades ---------- */
+const num = v => {
+  if (typeof v === "number") return v;
+  if (v === null || v === undefined) return 0;
+  return parseFloat(String(v).replace(/\s/g, "").replace(",", ".")) || 0;
+};
+const esc = s => String(s == null ? "" : s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+const VENTAS = DATA.ventas.map(v => ({
+  id_venta: v.id_venta, fecha: v.fecha, id_cliente: v.id_cliente, id_producto: v.id_producto,
+  cantidad: num(v.cantidad), precio_unitario: num(v.precio_unitario),
+  descuento: num(v.descuento), total: num(v.total),
+  canal: v.canal, vendedor: v.vendedor
+}));
+const PRODUCTOS = DATA.productos.map(p => ({ ...p,
+  precio_unitario: num(p.precio_unitario), costo_unitario: num(p.costo_unitario), stock_actual: num(p.stock_actual) }));
+const CLIENTES = DATA.clientes.map(c => ({ ...c }));
+
+const PROD = new Map(PRODUCTOS.map(p => [p.id_producto, p]));
+const CLI  = new Map(CLIENTES.map(c => [c.id_cliente, c]));
+
+const MONTHS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const PALETTE = ["#f472b6","#c4b5fd","#93c5fd","#6ee7b7","#fcd34d","#fda4af","#a5b4fc","#f9a8d4"];
+const BAR_CLASS = ["", "lav", "mint", "sky", "peach"];
+
+const money = n => "$ " + n.toLocaleString("es-EC",{minimumFractionDigits:2,maximumFractionDigits:2});
+const moneyShort = n => n.toLocaleString("es-EC",{minimumFractionDigits:0,maximumFractionDigits:0});
+const int = n => n.toLocaleString("es-EC",{maximumFractionDigits:0});
+const pct = n => (n*100).toLocaleString("es-EC",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+
+/* ---------- estado ---------- */
+const state = { canal:"", categoria:"", ciudad:"", desde:"", hasta:"", q:"" };
+const ui = { metric:"monto", page:0, sort:"fecha", dir:"desc" };
+
+function categoriaDe(v){ const p = PROD.get(v.id_producto); return p ? p.categoria : "(sin categoría)"; }
+function ciudadDe(v){ const c = CLI.get(v.id_cliente); return c ? c.ciudad : "(sin ciudad)"; }
+function tipoDe(v){ const c = CLI.get(v.id_cliente); return c ? c.tipo_cliente : "(sin tipo)"; }
+function nombreProducto(id){ return (PROD.get(id)||{}).nombre || id; }
+function nombreCliente(id){ return (CLI.get(id)||{}).nombre || id; }
+
+function filtradas(){
+  return VENTAS.filter(v => {
+    if (state.canal && v.canal !== state.canal) return false;
+    if (state.categoria && categoriaDe(v) !== state.categoria) return false;
+    if (state.ciudad && ciudadDe(v) !== state.ciudad) return false;
+    if (state.desde && v.fecha < state.desde) return false;
+    if (state.hasta && v.fecha > state.hasta) return false;
+    return true;
+  });
+}
+
+/* ---------- agregación ---------- */
+function agrupar(rows, keyFn, valFn){
+  const m = new Map();
+  for (const r of rows){
+    const k = keyFn(r);
+    const cur = m.get(k) || { key:k, count:0, value:0, qty:0 };
+    cur.count += 1; cur.value += valFn(r); cur.qty += r.cantidad;
+    m.set(k, cur);
+  }
+  return [...m.values()];
+}
+const porValorDesc = (a,b) => b.value - a.value;
+
+/* ---------- KPIs ---------- */
+function renderKpis(rows){
+  const total = rows.reduce((s,v)=>s+v.total,0);
+  const count = rows.length;
+  const avg = count ? total/count : 0;
+  const max = count ? Math.max(...rows.map(v=>v.total)) : 0;
+  const units = rows.reduce((s,v)=>s+v.cantidad,0);
+
+  document.getElementById("kTotal").textContent = money(total);
+  document.getElementById("kTotalSub").textContent = rows.length === VENTAS.length
+    ? "Sobre los 110 registros del CSV" : "Sobre " + rows.length + " registros filtrados";
+  document.getElementById("kCount").textContent = int(count);
+  document.getElementById("kCountSub").textContent = "de " + VENTAS.length + " ventas totales";
+  document.getElementById("kAvg").textContent = money(avg);
+  document.getElementById("kAvgSub").textContent = "Ticket promedio";
+  document.getElementById("kMax").textContent = money(max);
+  document.getElementById("kMaxSub").textContent = "Venta individual más alta";
+  document.getElementById("kUnits").textContent = int(units);
+  document.getElementById("kUnitsSub").textContent = "Suma de la columna cantidad";
+
+  document.getElementById("liveTotal").textContent = money(total);
+  document.getElementById("liveSub").textContent = count + " ventas · " + int(units) + " unidades";
+  document.getElementById("badgeRows").textContent = count + " ventas procesadas";
+
+  const fechas = rows.map(v=>v.fecha).sort();
+  document.getElementById("badgePeriod").textContent = fechas.length
+    ? fechas[0] + " → " + fechas[fechas.length-1] : "Sin datos en el filtro";
+}
+
+/* ---------- donut ---------- */
+function donutHTML(items, size, total){
+  const th = 34, r = (size-th)/2, cx = size/2, cy = size/2, C = 2*Math.PI*r;
+  let acc = 0;
+  const segs = items.map((d,i)=>{
+    const frac = total ? d.value/total : 0;
+    const col = PALETTE[i % PALETTE.length];
+    const seg = '<circle class="seg" cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+
+      '" stroke-width="'+th+'" stroke-dasharray="'+(frac*C)+' '+(C-frac*C)+
+      '" stroke-dashoffset="'+(-acc*C)+'" transform="rotate(-90 '+cx+' '+cy+')">'+
+      '<title>'+esc(d.key)+': '+money(d.value)+' ('+pct(frac)+')</title></circle>';
+    acc += frac;
+    return seg;
+  }).join("");
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="Distribución por canal">' +
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#fbe8f1" stroke-width="'+th+'"/>' + segs +
+    '<text x="'+cx+'" y="'+(cy-3)+'" text-anchor="middle" font-size="12.5" fill="#8a6b7d">Total</text>' +
+    '<text x="'+cx+'" y="'+(cy+19)+'" text-anchor="middle" font-size="15" font-weight="800" fill="#3d2033">'+money(total)+'</text>' +
+    '</svg>';
+}
+function donutInto(svgId, legendId, rows){
+  const total = rows.reduce((s,v)=>s+v.total,0);
+  const data = agrupar(rows, v=>v.canal, v=>v.total).sort(porValorDesc);
+  document.getElementById(svgId).innerHTML = donutHTML(data, 236, total);
+  document.getElementById(legendId).innerHTML = data.map((d,i)=>{
+    const col = PALETTE[i % PALETTE.length];
+    const share = total ? d.value/total : 0;
+    return '<div class="lg"><span class="dot" style="background:'+col+'"></span>'+
+      '<span class="nm">'+esc(d.key)+'</span>'+
+      '<span class="vl"><b>'+money(d.value)+'</b><br>'+pct(share)+' · '+d.count+' ventas</span></div>';
+  }).join("") || '<div class="empty">Sin datos</div>';
+}
+
+/* ---------- barras ---------- */
+function renderBars(el, data, fmtVal, cls){
+  const max = Math.max(...data.map(d=>d.value), 1);
+  el.innerHTML = data.map((d,i)=>{
+    const w = Math.max(2, (d.value/max)*100);
+    const clsRow = BAR_CLASS[(typeof cls === "number" ? cls : i) % BAR_CLASS.length];
+    const title = esc(d.label || d.key) + " · " + fmtVal(d.value, d);
+    return '<div class="bar-row '+clsRow+'" title="'+title+'">'+
+      '<span class="lbl">'+esc(d.label || d.key)+'</span>'+
+      '<span class="track"><span class="fill" style="width:'+w+'%"></span></span>'+
+      '<span class="val">'+fmtVal(d.value, d)+'</span></div>';
+  }).join("") || '<div class="empty">Sin datos para este filtro</div>';
+}
+
+/* ---------- columnas mensuales ---------- */
+function renderMes(rows){
+  const map = new Map();
+  for (const v of rows) map.set(v.fecha.slice(0,7), (map.get(v.fecha.slice(0,7))||0) + v.total);
+  const items = [...map.keys()].sort().map(k=>({ label: MONTHS[parseInt(k.slice(5,7),10)-1], full:k, value: map.get(k) }));
+
+  const W = 620, H = 236, pad = { l:56, r:12, t:16, b:32 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const rawMax = Math.max(...items.map(i=>i.value), 1);
+  const step = Math.pow(10, Math.floor(Math.log10(rawMax)));
+  const max = Math.ceil(rawMax/step)*step || 1;
+  const bw = items.length ? Math.min(58, iw/items.length*0.58) : 0;
+
+  let grid = "";
+  for (let g=0; g<=4; g++){
+    const y = pad.t + ih - ih*(g/4);
+    const val = max*(g/4);
+    grid += '<line x1="'+pad.l+'" y1="'+y+'" x2="'+(W-pad.r)+'" y2="'+y+'" stroke="#fbe8f1" stroke-width="1"/>' +
+      '<text x="'+(pad.l-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10.5" fill="#a98a9b">'+
+      (val>=1000 ? (val/1000).toFixed(1)+"k" : val.toFixed(0)) + '</text>';
+  }
+
+  const bars = items.map((it,i)=>{
+    const x = pad.l + (iw/items.length)*i + (iw/items.length - bw)/2;
+    const h = (it.value/max)*ih, y = pad.t + ih - h;
+    const col = PALETTE[i % 3];
+    return '<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(h,0)+'" rx="7" fill="'+col+'">'+
+        '<title>'+esc(it.full)+': '+money(it.value)+'</title></rect>'+
+      '<text x="'+(x+bw/2)+'" y="'+(H-11)+'" text-anchor="middle" font-size="11" fill="#8a6b7d">'+esc(it.label)+'</text>'+
+      '<text x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle" font-size="10" font-weight="800" fill="#7a4560">'+
+        (it.value>=1000 ? (it.value/1000).toFixed(1)+"k" : it.value.toFixed(0)) + '</text>';
+  }).join("");
+
+  document.getElementById("chartMes").innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Evolución mensual de ventas en USD">'+
+      grid +
+      '<line x1="'+pad.l+'" y1="'+(pad.t+ih)+'" x2="'+(W-pad.r)+'" y2="'+(pad.t+ih)+'" stroke="#eecfdd"/>'+
+      bars +
+      '<text x="'+(pad.l-8)+'" y="'+(pad.t-4)+'" text-anchor="end" font-size="9.5" fill="#a98a9b">USD</text>'+
+    '</svg>';
+}
+
+/* ---------- tablas ---------- */
+function renderTablaProductos(rows){
+  const data = agrupar(rows, v=>v.id_producto, v=>v.total).sort((a,b)=>b.qty-a.qty).slice(0,5);
+  const map = { "Bebidas":"sky","Snacks":"lemon","Despensa":"lav","Limpieza":"mint","Cuidado Personal":"pink" };
+  document.getElementById("tbodyProductos").innerHTML = data.map(d=>{
+    const p = PROD.get(d.key) || {};
+    const cat = p.categoria || "—";
+    return '<tr><td class="name">'+esc(p.nombre || d.key)+'</td>'+
+      '<td><span class="pill '+(map[cat]||"pink")+'">'+esc(cat)+'</span></td>'+
+      '<td style="text-align:right">'+int(d.qty)+'</td>'+
+      '<td style="text-align:right">'+money(d.value)+'</td></tr>';
+  }).join("") || '<tr><td colspan="4" class="empty">Sin datos</td></tr>';
+}
+
+function renderCanalesTabla(rows){
+  const total = rows.reduce((s,v)=>s+v.total,0) || 1;
+  const data = agrupar(rows, v=>v.canal, v=>v.total).sort(porValorDesc);
+  document.getElementById("tbodyCanales").innerHTML = data.map(d=>
+    '<tr><td class="name">'+esc(d.key)+'</td>'+
+    '<td style="text-align:right">'+int(d.count)+'</td>'+
+    '<td style="text-align:right">'+money(d.value)+'</td>'+
+    '<td style="text-align:right">'+money(d.value/d.count)+'</td></tr>'
+  ).join("") || '<tr><td colspan="4" class="empty">Sin datos</td></tr>';
+}
+
+const PAGE_SIZE = 20;
+function filasTabla(){
+  const q = state.q.trim().toLowerCase();
+  let arr = filtradas().map(v => ({
+    ...v,
+    cliente: nombreCliente(v.id_cliente),
+    producto: nombreProducto(v.id_producto)
+  }));
+  if (q){
+    arr = arr.filter(v =>
+      (v.id_venta + " " + v.cliente + " " + v.producto + " " + v.vendedor + " " + v.canal).toLowerCase().includes(q)
+    );
+  }
+  const k = ui.sort, dir = ui.dir === "asc" ? 1 : -1;
+  arr.sort((a,b)=>{
+    const x = a[k], y = b[k];
+    if (typeof x === "number" && typeof y === "number") return (x-y)*dir;
+    return String(x).localeCompare(String(y), "es", { numeric:true })*dir;
+  });
+  return arr;
+}
+function renderTablaVentas(){
+  const data = filasTabla();
+  const pages = Math.max(1, Math.ceil(data.length/PAGE_SIZE));
+  if (ui.page > pages-1) ui.page = pages-1;
+  if (ui.page < 0) ui.page = 0;
+  const start = ui.page*PAGE_SIZE;
+  const slice = data.slice(start, start+PAGE_SIZE);
+
+  document.getElementById("tbodyVentas").innerHTML = slice.map(v =>
+    '<tr><td>'+esc(v.id_venta)+'</td>'+
+    '<td>'+esc(v.fecha)+'</td>'+
+    '<td>'+esc(v.cliente)+'</td>'+
+    '<td>'+esc(v.producto)+'</td>'+
+    '<td>'+esc(v.canal)+'</td>'+
+    '<td>'+esc(v.vendedor)+'</td>'+
+    '<td style="text-align:right">'+int(v.cantidad)+'</td>'+
+    '<td style="text-align:right">'+money(v.total)+'</td></tr>'
+  ).join("") || '<tr><td colspan="8" class="empty">Sin resultados</td></tr>';
+
+  const colNames = { id_venta:"ID", fecha:"Fecha", cliente:"Cliente", producto:"Producto",
+    canal:"Canal", vendedor:"Vendedor", cantidad:"Cantidad", total:"Total" };
+  document.getElementById("subTabla").textContent =
+    data.length + (data.length === 1 ? " registro" : " registros") +
+    " · ordenado por " + colNames[ui.sort] + (ui.dir === "asc" ? " (asc)" : " (desc)") +
+    " · clic en el encabezado para cambiar";
+  document.getElementById("countTabla").textContent = data.length + " de " + filtradas().length + " visibles";
+
+  const from = data.length ? start+1 : 0;
+  const to = Math.min(start+PAGE_SIZE, data.length);
+  document.getElementById("pageInfo").textContent = "Mostrando " + from + "–" + to + " de " + data.length;
+  document.getElementById("prevPage").disabled = ui.page === 0;
+  document.getElementById("nextPage").disabled = ui.page >= pages-1;
+}
+
+/* ---------- insights ---------- */
+function setText(id, t){ const el = document.getElementById(id); if (el) el.textContent = t; }
+function renderInsights(rows, total){
+  const canales = agrupar(rows, v=>v.canal, v=>v.total).sort(porValorDesc);
+  setText("subCanal", canales.length ? canales[0].key + " lidera con " + money(canales[0].value) + " (" + pct(canales[0].value/total) + " del total)" : "Sin datos");
+  setText("subCanal2", canales.length ? "Participación de cada canal · " + canales[0].key + " concentra " + pct(canales[0].value/total) : "Participación de cada canal en el total");
+
+  const cats = agrupar(rows, v=>categoriaDe(v), v=>v.total).sort(porValorDesc);
+  setText("subCategoria", cats.length ? cats[0].key + " lidera con " + money(cats[0].value) + " (" + pct(cats[0].value/total) + ")" : "Sin datos");
+
+  const prods = agrupar(rows, v=>v.id_producto, v=>v.total).sort((a,b)=>b.qty-a.qty);
+  setText("subTopProductos", prods.length ? nombreProducto(prods[0].key) + " encabeza con " + int(prods[0].qty) + " unidades" : "Sin datos");
+  setText("subProductosTab", prods.length ? nombreProducto(prods[0].key) + " es el más vendido por " + (ui.metric === "monto" ? "ingreso" : "unidades") : "Cruce ventas ↔ productos");
+
+  const meses = agrupar(rows, v=>v.fecha.slice(0,7), v=>v.total).sort(porValorDesc);
+  setText("subMes", meses.length ? "Monto por mes (USD) · pico en " + MONTHS[parseInt(meses[0].key.slice(5,7),10)-1] + " con " + money(meses[0].value) : "Monto vendido por mes (USD)");
+
+  const cli = agrupar(rows, v=>v.id_cliente, v=>v.total).sort(porValorDesc);
+  setText("subClientes", cli.length ? nombreCliente(cli[0].key) + " aporta " + money(cli[0].value) + " (" + pct(cli[0].value/total) + ")" : "Cruce ventas ↔ clientes");
+
+  const vend = agrupar(rows, v=>v.vendedor, v=>v.total).sort(porValorDesc);
+  setText("subVendedores", vend.length ? vend[0].key + " encabeza con " + money(vend[0].value) : "Monto total vendido por persona");
+}
+
+/* ---------- resumen ---------- */
+function renderSummary(rows){
+  if (!rows.length){ setText("summaryText", "No hay ventas que coincidan con los filtros seleccionados."); return; }
+  const total = rows.reduce((s,v)=>s+v.total,0);
+  const canal = agrupar(rows, v=>v.canal, v=>v.total).sort(porValorDesc)[0];
+  const cat = agrupar(rows, v=>categoriaDe(v), v=>v.total).sort(porValorDesc)[0];
+  const prod = agrupar(rows, v=>v.id_producto, v=>v.total).sort((a,b)=>b.qty-a.qty)[0];
+  const ciudad = agrupar(rows, v=>ciudadDe(v), v=>v.total).sort(porValorDesc)[0];
+
+  document.getElementById("summaryText").innerHTML =
+    "Se registraron <b>"+int(rows.length)+" ventas</b> por <b>"+money(total)+"</b>, con ticket promedio de <b>"+money(total/rows.length)+"</b>. "+
+    "El canal con más ingreso fue <b>"+esc(canal.key)+"</b> ("+money(canal.value)+", "+pct(canal.value/total)+"). "+
+    "La categoría más fuerte fue <b>"+esc(cat.key)+"</b> ("+money(cat.value)+"). "+
+    "El producto más vendido por cantidad fue <b>"+esc(nombreProducto(prod.key))+"</b> ("+int(prod.qty)+" unidades). "+
+    "La ciudad que más aportó fue <b>"+esc(ciudad.key)+"</b>. "+
+    "En total se movieron <b>"+int(rows.reduce((s,v)=>s+v.cantidad,0))+" unidades</b>.";
+}
+
+/* ---------- stock ---------- */
+function renderStock(){
+  const low = PRODUCTOS.filter(p=>p.stock_actual < 300).sort((a,b)=>a.stock_actual-b.stock_actual);
+  document.getElementById("alertsStock").innerHTML = low.map(p=>
+    '<div class="alert"><span class="ic">!</span><span><span class="nm">'+esc(p.nombre)+'</span><br>'+
+    '<span class="st">'+esc(p.categoria)+' · reponer</span></span>'+
+    '<span class="num">'+int(p.stock_actual)+' u.</span></div>'
+  ).join("") || '<div class="empty">Todos los productos tienen stock suficiente.</div>';
+}
+
+/* ---------- verificación ---------- */
+const CONTROLES = { total: 3049.17, filas: 110, promedio: 27.72 };
+function renderChecks(rows){
+  const t = rows.reduce((s,v)=>s+v.total,0);
+  const c = rows.length;
+  const a = c ? t/c : 0;
+  const base = rows.length === VENTAS.length;
+  const items = [
+    { k:"Suma de la columna total", exp: CONTROLES.total, got: t, f: money },
+    { k:"Número de ventas registradas", exp: CONTROLES.filas, got: c, f: int },
+    { k:"Promedio de la columna total", exp: CONTROLES.promedio, got: a, f: money }
+  ];
+  document.getElementById("checks").innerHTML = items.map(it=>{
+    const ok = base ? Math.abs(it.got - it.exp) < 0.01 : null;
+    const mark = ok === true ? "✓" : (ok === false ? "✗" : "i");
+    const cls = ok === false ? "mark no" : "mark";
+    return '<div class="chk"><span class="'+cls+'">'+mark+'</span>'+
+      '<span class="k">'+it.k+'</span>'+
+      '<span class="exp">'+it.f(it.got)+(base ? ' <b>/ '+it.f(it.exp)+'</b>' : '')+'</span></div>';
+  }).join("") +
+  (base ? '<div class="empty" style="padding:4px 0 0;text-align:left;font-size:12px">✓ Los tres controles coinciden con el cálculo directo sobre ventas.csv.</div>'
+        : '<div class="empty" style="padding:4px 0 0;text-align:left;font-size:12px">Los controles fijos aplican al dataset completo; con filtros se muestra el valor calculado.</div>');
+
+  document.getElementById("miniCoverage").innerHTML =
+    '<div class="mini"><div class="t">Ventas</div><div class="v">'+int(VENTAS.length)+'</div></div>' +
+    '<div class="mini"><div class="t">Productos</div><div class="v">'+int(PRODUCTOS.length)+'</div></div>' +
+    '<div class="mini"><div class="t">Clientes</div><div class="v">'+int(CLIENTES.length)+'</div></div>';
+}
+
+/* ---------- clientes (mini) ---------- */
+function renderMiniClientes(rows){
+  const total = rows.reduce((s,v)=>s+v.total,0) || 1;
+  const cli = agrupar(rows, v=>v.id_cliente, v=>v.total).sort(porValorDesc);
+  const top5 = cli.slice(0,5).reduce((s,d)=>s+d.value,0);
+  const activos = cli.length;
+  const ticket = rows.length ? total/rows.length : 0;
+  document.getElementById("miniClientes").innerHTML =
+    '<div class="mini"><div class="t">Clientes activos</div><div class="v">'+int(activos)+'</div></div>' +
+    '<div class="mini"><div class="t">Top 5 concentran</div><div class="v">'+pct(top5/total)+'</div></div>' +
+    '<div class="mini"><div class="t">Ticket promedio</div><div class="v">'+money(ticket)+'</div></div>';
+}
+
+/* ---------- render global ---------- */
+function render(){
+  const rows = filtradas();
+  const total = rows.reduce((s,v)=>s+v.total,0) || 1;
+
+  renderKpis(rows);
+
+  donutInto("donutCanal", "legendCanal", rows);
+  donutInto("donutCanal2", "legendCanal2", rows);
+
+  renderBars(document.getElementById("barsCategoria"),
+    agrupar(rows, v=>categoriaDe(v), v=>v.total).sort(porValorDesc).map(d=>({ label:d.key, value:d.value })),
+    v=>money(v));
+
+  renderBars(document.getElementById("barsTopProductos"),
+    agrupar(rows, v=>v.id_producto, v=>v.total).sort((a,b)=>b.qty-a.qty).slice(0,5)
+      .map(d=>({ label:nombreProducto(d.key), value:d.qty })),
+    v=>int(v)+" u.", 0);
+
+  renderMes(rows);
+  renderBars(document.getElementById("barsVendedores"),
+    agrupar(rows, v=>v.vendedor, v=>v.total).sort(porValorDesc).map(d=>({ label:d.key, value:d.value })),
+    v=>money(v), 1);
+  renderBars(document.getElementById("barsCanalCount"),
+    agrupar(rows, v=>v.canal, v=>v.total).sort((a,b)=>b.count-a.count).map(d=>({ label:d.key, value:d.count })),
+    v=>int(v)+" ventas", 3);
+  renderCanalesTabla(rows);
+
+  const prodData = agrupar(rows, v=>v.id_producto, v=>v.total)
+    .sort((a,b)=> ui.metric === "monto" ? b.value-a.value : b.qty-a.qty)
+    .slice(0,10)
+    .map(d=>({ label:nombreProducto(d.key), value: ui.metric === "monto" ? d.value : d.qty }));
+  renderBars(document.getElementById("barsProductos"), prodData,
+    v => ui.metric === "monto" ? money(v) : int(v)+" u.", 0);
+  renderTablaProductos(rows);
+
+  renderBars(document.getElementById("barsTopClientes"),
+    agrupar(rows, v=>v.id_cliente, v=>v.total).sort(porValorDesc).slice(0,10)
+      .map(d=>({ label:nombreCliente(d.key), value:d.value })),
+    v=>money(v), 0);
+  renderBars(document.getElementById("barsCiudades"),
+    agrupar(rows, v=>ciudadDe(v), v=>v.total).sort(porValorDesc).slice(0,10)
+      .map(d=>({ label:d.key, value:d.value })),
+    v=>money(v), 3);
+  renderBars(document.getElementById("barsTipos"),
+    agrupar(rows, v=>tipoDe(v), v=>v.total).sort(porValorDesc)
+      .map(d=>({ label:d.key, value:d.value })),
+    v=>money(v), 4);
+  renderMiniClientes(rows);
+
+  renderTablaVentas();
+  renderInsights(rows, total);
+  renderSummary(rows);
+  renderChecks(rows);
+}
+
+/* ---------- pestañas ---------- */
+function selectTab(id){
+  document.querySelectorAll('[role="tab"]').forEach(t=>{
+    const on = t.dataset.tab === id;
+    t.setAttribute("aria-selected", on ? "true" : "false");
+    t.tabIndex = on ? 0 : -1;
+  });
+  document.querySelectorAll('[role="tabpanel"]').forEach(p=>{
+    p.classList.toggle("active", p.id === "panel-" + id);
+  });
+  try { history.replaceState(null, "", "#" + id); } catch(e) { /* file:// sin historial */ }
+}
+function initTabs(){
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  tabs.forEach((t, i)=>{
+    t.addEventListener("click", ()=>selectTab(t.dataset.tab));
+    t.addEventListener("keydown", e=>{
+      let next = null;
+      if (e.key === "ArrowRight") next = tabs[(i+1) % tabs.length];
+      if (e.key === "ArrowLeft")  next = tabs[(i-1+tabs.length) % tabs.length];
+      if (e.key === "Home") next = tabs[0];
+      if (e.key === "End")  next = tabs[tabs.length-1];
+      if (next){ e.preventDefault(); next.focus(); selectTab(next.dataset.tab); }
+    });
+  });
+  const requested = (location.hash || "").replace("#","");
+  selectTab(["resumen","canales","productos","clientes","datos"].includes(requested) ? requested : "resumen");
+}
+
+/* ---------- exportar ---------- */
+function csvCell(v){
+  const s = String(v == null ? "" : v);
+  return /[",;\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function exportCsv(){
+  const rows = filasTabla();
+  const head = ["id_venta","fecha","cliente","producto","categoria","ciudad","cantidad","precio_unitario","descuento","total","canal","vendedor"];
+  const lines = [head.join(",")].concat(rows.map(v=>[
+    v.id_venta, v.fecha, v.cliente, v.producto, categoriaDe(v), ciudadDe(v),
+    v.cantidad, v.precio_unitario.toFixed(2), v.descuento.toFixed(2), v.total.toFixed(2), v.canal, v.vendedor
+  ].map(csvCell).join(",")));
+  const csv = "\uFEFF" + lines.join("\r\n");
+  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ventas_filtradas.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------- arranque ---------- */
+function fillSelect(id, values){
+  const el = document.getElementById(id);
+  const base = el.options[0].outerHTML;
+  el.innerHTML = base + values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");
+}
+function resetPage(){ ui.page = 0; }
+
+function init(){
+  fillSelect("fCanal", [...new Set(VENTAS.map(v=>v.canal))].sort());
+  fillSelect("fCategoria", [...new Set(PRODUCTOS.map(p=>p.categoria))].sort());
+  fillSelect("fCiudad", [...new Set(CLIENTES.map(c=>c.ciudad))].sort());
+
+  initTabs();
+
+  document.getElementById("fCanal").addEventListener("change", e=>{ state.canal = e.target.value; resetPage(); render(); });
+  document.getElementById("fCategoria").addEventListener("change", e=>{ state.categoria = e.target.value; resetPage(); render(); });
+  document.getElementById("fCiudad").addEventListener("change", e=>{ state.ciudad = e.target.value; resetPage(); render(); });
+  document.getElementById("fDesde").addEventListener("change", e=>{ state.desde = e.target.value; resetPage(); render(); });
+  document.getElementById("fHasta").addEventListener("change", e=>{ state.hasta = e.target.value; resetPage(); render(); });
+  document.getElementById("btnReset").addEventListener("click", ()=>{
+    state.canal = state.categoria = state.ciudad = state.desde = state.hasta = state.q = "";
+    document.getElementById("fCanal").value = "";
+    document.getElementById("fCategoria").value = "";
+    document.getElementById("fCiudad").value = "";
+    document.getElementById("fDesde").value = "";
+    document.getElementById("fHasta").value = "";
+    document.getElementById("qTabla").value = "";
+    document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active", c.dataset.from === "" && c.dataset.to === ""));
+    resetPage(); render();
+  });
+  document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
+
+  document.querySelectorAll(".chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      state.desde = chip.dataset.from;
+      state.hasta = chip.dataset.to;
+      document.getElementById("fDesde").value = state.desde;
+      document.getElementById("fHasta").value = state.hasta;
+      document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active", c === chip));
+      resetPage(); render();
+    });
+  });
+
+  document.querySelectorAll(".segbtn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      ui.metric = b.dataset.metric;
+      document.querySelectorAll(".segbtn").forEach(x=>x.classList.toggle("active", x === b));
+      render();
+    });
+  });
+
+  document.getElementById("qTabla").addEventListener("input", e=>{ state.q = e.target.value; resetPage(); renderTablaVentas(); });
+
+  document.querySelectorAll("#tablaVentas th").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.getAttribute("data-sort");
+      if (ui.sort === key){ ui.dir = ui.dir === "asc" ? "desc" : "asc"; }
+      else { ui.sort = key; ui.dir = (key === "fecha" || key === "total" || key === "cantidad") ? "desc" : "asc"; }
+      resetPage(); renderTablaVentas();
+    });
+  });
+  document.getElementById("prevPage").addEventListener("click", ()=>{ ui.page--; renderTablaVentas(); });
+  document.getElementById("nextPage").addEventListener("click", ()=>{ ui.page++; renderTablaVentas(); });
+  document.getElementById("btnExport").addEventListener("click", exportCsv);
+
+  renderStock();
+  render();
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

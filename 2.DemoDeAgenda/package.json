@@ -1,0 +1,15 @@
+{
+  "name": "demo-de-agenda",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agenda personal local (CLI + web) con SQLite, sin internet — Frank",
+  "scripts": {
+    "start": "node src/cli.js",
+    "web": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

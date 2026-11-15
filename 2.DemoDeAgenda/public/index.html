@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agenda personal · Frank</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1b2438;
+    --card-2: #222e46;
+    --line: #2e3b57;
+    --txt: #e8edf7;
+    --muted: #97a3ba;
+    --accent: #4f9cf9;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1100px 600px at 15% -10%, #1e2f52 0%, var(--bg) 55%);
+    color: var(--txt);
+    padding: 32px 20px 56px;
+  }
+  header { max-width: 1040px; margin: 0 auto 24px; }
+  h1 { margin: 0; font-size: 1.7rem; letter-spacing: -.02em; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin-top: 6px; font-size: .92rem; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .chip {
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 14px; font-size: .85rem; color: var(--muted);
+  }
+  .chip b { color: var(--txt); }
+  .chip.pending b { color: var(--warn); }
+  .chip.done b { color: var(--ok); }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .toggle {
+    background: var(--card); color: var(--txt); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 14px; font: inherit; font-size: .86rem;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .toggle:hover { border-color: var(--accent); }
+  .toggle[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent);
+    color: #04101f; font-weight: 600;
+  }
+  .hint { color: var(--muted); font-size: .8rem; }
+  main {
+    max-width: 1040px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  @media (max-width: 780px) { main { grid-template-columns: 1fr; } }
+  section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px 18px 14px;
+    display: flex; flex-direction: column; min-height: 260px;
+  }
+  section h2 {
+    margin: 0; font-size: 1.05rem; display: flex; align-items: baseline;
+    justify-content: space-between; gap: 8px;
+  }
+  section h2 small { color: var(--muted); font-weight: 400; font-size: .78rem; }
+  ul { list-style: none; margin: 14px 0; padding: 0; flex: 1; }
+  li {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card-2); border: 1px solid transparent;
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    transition: border-color .15s, opacity .15s;
+  }
+  li:hover { border-color: var(--line); }
+  li.done .title { text-decoration: line-through; color: var(--muted); }
+  li input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; }
+  .title { flex: 1; font-size: .95rem; word-break: break-word; }
+  .del {
+    background: none; border: 0; color: var(--muted); cursor: pointer;
+    font-size: 1rem; line-height: 1; padding: 4px; border-radius: 6px;
+  }
+  .del:hover { color: var(--danger); background: #ffffff12; }
+  .badge {
+    font-size: .72rem; border-radius: 999px; padding: 3px 9px;
+    border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
+  }
+  .badge.today {
+    color: var(--warn); border-color: #fbbf2455; background: #fbbf2414;
+  }
+  .badge.overdue {
+    color: var(--danger); border-color: #f8717155; background: #f8717114;
+  }
+  .empty { color: var(--muted); font-size: .88rem; padding: 10px 2px; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  form input[type="text"] {
+    flex: 1 1 160px;
+  }
+  form input[type="date"] {
+    flex: 0 0 148px; color-scheme: dark;
+  }
+  form input {
+    background: #101827; color: var(--txt);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 12px; font-size: .92rem; font-family: inherit;
+  }
+  form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form button {
+    background: var(--accent); color: #04101f; border: 0; border-radius: 10px;
+    padding: 0 16px; font-weight: 600; font-size: .9rem; cursor: pointer;
+  }
+  form button:hover { filter: brightness(1.08); }
+  .msg { min-height: 18px; font-size: .82rem; color: var(--danger); margin-top: 8px; }
+  footer { max-width: 1040px; margin: 22px auto 0; color: var(--muted); font-size: .78rem; }
+  footer code { color: var(--txt); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Agenda personal de <span id="owner">Frank</span></h1>
+    <div class="sub">
+      Hoy es <b id="todayDate">…</b>. Todo se guarda en tu equipo, sin internet.
+      Las tareas se ordenan por urgencia: primero la fecha límite más próxima.
+    </div>
+    <div class="chips">
+      <div class="chip pending">Pendientes hoy: <b id="pendingToday">0</b></div>
+      <div class="chip pending">Pendientes mañana: <b id="pendingTomorrow">0</b></div>
+      <div class="chip done">Hechas hoy: <b id="doneToday">0</b></div>
+      <div class="chip done">Hechas mañana: <b id="doneTomorrow">0</b></div>
+    </div>
+    <div class="toolbar">
+      <button type="button" id="togglePending" class="toggle" aria-pressed="false">
+        Ver solo pendientes
+      </button>
+      <span class="hint" id="viewHint">Mostrando todas las tareas.</span>
+    </div>
+  </header>
+
+  <main>
+    <section data-day="today">
+      <h2>Hoy <small id="dateToday"></small></h2>
+      <ul id="listToday"></ul>
+      <form data-day="today">
+        <input type="text" placeholder="Nueva tarea para hoy…" maxlength="200" required />
+        <input type="date" class="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
+        <button type="submit">Agregar</button>
+      </form>
+      <div class="msg" aria-live="polite"></div>
+    </section>
+
+    <section data-day="tomorrow">
+      <h2>Mañana <small id="dateTomorrow"></small></h2>
+      <ul id="listTomorrow"></ul>
+      <form data-day="tomorrow">
+        <input type="text" placeholder="Nueva meta para mañana…" maxlength="200" required />
+        <input type="date" class="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
+        <button type="submit">Agregar</button>
+      </form>
+      <div class="msg" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    Base local: <code>agenda.db</code> (SQLite) · Interfaz en <code>http://localhost:3000</code>
+  </footer>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  // Reto Nivel 1: vista «solo pendientes». Se recuerda en el navegador.
+  let onlyPending = false;
+  try { onlyPending = localStorage.getItem('agenda.onlyPending') === '1'; } catch {}
+  let lastData = null;
+
+  function updateToggle() {
+    const button = $('togglePending');
+    button.setAttribute('aria-pressed', String(onlyPending));
+    button.textContent = onlyPending ? 'Viendo solo pendientes' : 'Ver solo pendientes';
+    $('viewHint').textContent = onlyPending
+      ? 'Mostrando únicamente las tareas pendientes.'
+      : 'Mostrando todas las tareas.';
+  }
+
+  function setOnlyPending(value) {
+    onlyPending = value;
+    try { localStorage.setItem('agenda.onlyPending', value ? '1' : '0'); } catch {}
+    updateToggle();
+    if (lastData) render(lastData);
+  }
+
+  function shortDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('es-EC', {
+      day: '2-digit',
+      month: 'short',
+    });
+  }
+
+  // Reto Nivel 2: insignia de fecha límite con su nivel de urgencia.
+  function deadlineBadge(task) {
+    if (!task.deadline) return null;
+    const badge = document.createElement('span');
+    badge.className =
+      'badge' + (task.overdue ? ' overdue' : task.dueToday ? ' today' : '');
+    badge.textContent = task.overdue
+      ? 'Vencida ' + shortDate(task.deadline)
+      : task.dueToday
+        ? 'Vence hoy'
+        : 'Límite ' + shortDate(task.deadline);
+    badge.title = 'Fecha límite: ' + task.deadline;
+    return badge;
+  }
+
+  function renderList(ul, tasks, emptyText) {
+    ul.innerHTML = '';
+    if (tasks.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = emptyText;
+      ul.appendChild(li);
+      return;
+    }
+    for (const task of tasks) {
+      const li = document.createElement('li');
+      if (task.done) li.classList.add('done');
+
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.checked = task.done;
+      check.title = task.done ? 'Marcar como pendiente' : 'Marcar como hecha';
+      check.addEventListener('change', () => toggle(task.id));
+
+      const title = document.createElement('span');
+      title.className = 'title';
+      title.textContent = task.title;
+
+      const badge = deadlineBadge(task);
+
+      const del = document.createElement('button');
+      del.className = 'del';
+      del.textContent = '✕';
+      del.title = 'Eliminar tarea';
+      del.addEventListener('click', () => remove(task.id));
+
+      li.append(check, title);
+      if (badge) li.appendChild(badge);
+      li.appendChild(del);
+      ul.appendChild(li);
+    }
+  }
+
+  function render(data) {
+    $('owner').textContent = data.owner;
+    $('todayDate').textContent = data.todayDate;
+    $('dateToday').textContent = data.todayDate;
+    $('dateTomorrow').textContent = data.tomorrowDate;
+
+    $('pendingToday').textContent = data.summary.today.pending;
+    $('pendingTomorrow').textContent = data.summary.tomorrow.pending;
+    $('doneToday').textContent = data.summary.today.total - data.summary.today.pending;
+    $('doneTomorrow').textContent = data.summary.tomorrow.total - data.summary.tomorrow.pending;
+
+    const visible = (list) => (onlyPending ? list.filter((t) => !t.done) : list);
+
+    renderList($('listToday'), visible(data.today), onlyPending
+      ? 'No quedan tareas pendientes para hoy.'
+      : 'No hay tareas para hoy. Agrega la primera abajo.');
+    renderList($('listTomorrow'), visible(data.tomorrow), onlyPending
+      ? 'No quedan metas pendientes para mañana.'
+      : 'No hay metas para mañana. Agrega la primera abajo.');
+  }
+
+  async function api(path, options) {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || 'Error de conexión con la agenda.');
+    return body;
+  }
+
+  async function refresh() {
+    try {
+      lastData = await api('/api/tasks');
+      render(lastData);
+    } catch (err) {
+      document.querySelectorAll('.msg').forEach((m) => (m.textContent = err.message));
+    }
+  }
+
+  async function toggle(id) {
+    try {
+      await api('/api/tasks/' + id + '/toggle', { method: 'POST' });
+      await refresh();
+    } catch (err) {
+      alert(err.message);
+      await refresh();
+    }
+  }
+
+  async function remove(id) {
+    if (!confirm('¿Eliminar esta tarea?')) return;
+    try {
+      await api('/api/tasks/' + id, { method: 'DELETE' });
+      await refresh();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  document.querySelectorAll('form[data-day]').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = form.querySelector('input[type="text"]');
+      const dateInput = form.querySelector('input[type="date"]');
+      const msg = form.parentElement.querySelector('.msg');
+      const title = input.value.trim();
+      msg.textContent = '';
+      if (!title) {
+        msg.textContent = 'Escribe un título antes de agregar.';
+        return;
+      }
+      try {
+        await api('/api/tasks', {
+          method: 'POST',
+          body: JSON.stringify({
+            title,
+            day: form.dataset.day,
+            deadline: dateInput.value || null,
+          }),
+        });
+        input.value = '';
+        dateInput.value = '';
+        input.focus();
+        await refresh();
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    });
+  });
+
+  $('togglePending').addEventListener('click', () => setOnlyPending(!onlyPending));
+
+  updateToggle();
+  refresh();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+id_cliente,nombre,tipo_cliente,ciudad,fecha_alta,correo,telefono,estado
+C001,Supermercado El Ahorro,Mayorista,Quito,2021-03-15,contacto@elahorro.com.ec,02-245-1180,Activo
+C002,Tienda Dona Rosa,Minorista,Quito,2022-07-02,ventas@tiendadorarosa.ec,02-266-9043,Activo
+C003,Distribuidora Costa Sur,Mayorista,Guayaquil,2020-11-20,compras@costasur.com.ec,04-238-7712,Activo
+C004,Mini Market La Esquina,Minorista,Guayaquil,2023-01-18,laesquina@correo.ec,04-251-3390,Activo
+C005,Hotel Vista Andina,Corporativo,Cuenca,2021-09-05,abastecimiento@vistaandina.ec,07-283-4455,Activo
+C006,Restaurante El Sabor Cuencano,Minorista,Cuenca,2022-05-23,reservas@saborcuencano.ec,07-281-9021,Activo
+C007,Corporativo Textil Ambato,Corporativo,Ambato,2020-06-12,compras@textilambato.ec,03-242-6678,Activo
+C008,Distribuidora Tungurahua,Mayorista,Ambato,2021-12-01,ventas@distritungurahua.ec,03-240-1188,Inactivo
+C009,Comercial Manta Express,Mayorista,Manta,2022-02-14,pedidos@mantaexpress.ec,05-262-3344,Activo
+C010,Cafeteria Puerto Azul,Minorista,Manta,2023-04-07,administracion@puertoazul.ec,05-261-7788,Activo
+C011,Bodega Loja Central,Mayorista,Loja,2021-08-19,bodegaloja@correo.ec,07-257-2211,Activo
+C012,Farmacia San Sebastian,Minorista,Loja,2022-10-30,fsansebastian@correo.ec,07-258-9045,Activo
+C013,Supermercado Machala Real,Mayorista,Machala,2020-04-25,compras@machalarreal.ec,07-293-1166,Activo
+C014,Panaderia El Trigal,Minorista,Riobamba,2023-06-11,eltrigal@correo.ec,03-296-5522,Activo
+C015,Distribuidora Centro Andina,Mayorista,Riobamba,2022-03-09,ventas@centroandina.ec,03-295-7788,Activo
+C016,Comisariato Portoviejo,Mayorista,Portoviejo,2021-01-27,compras@comisariatopp.ec,05-263-4400,Activo
+C017,Tienda La Manabita,Minorista,Portoviejo,2023-09-14,lamanabita@correo.ec,05-264-9911,Activo
+C018,Supermercado Santo Domingo,Mayorista,Santo Domingo,2020-12-08,compras@supersto.ec,02-375-2200,Activo
+C019,Restaurante La Cascada,Minorista,Santo Domingo,2022-11-16,lacascada@correo.ec,02-376-8833,Activo
+C020,Comercial Ibarra Norte,Mayorista,Ibarra,2021-05-04,ventas@ibarrnorte.ec,06-264-5566,Inactivo
+C021,Hotel Salinas Beach,Corporativo,Salinas,2022-08-22,abastecimiento@salinasbeach.ec,04-277-4400,Activo
+C022,Minimarket Cuenca Sur,Minorista,Cuenca,2023-02-28,cuencasur@correo.ec,07-286-3344,Activo
+C023,Distribuidora Guayas,Mayorista,Guayaquil,2020-09-17,pedidos@distriguayas.ec,04-229-6677,Activo
+C024,Tienda Familiar Quito Norte,Minorista,Quito,2023-07-05,familiarqtn@correo.ec,02-248-7700,Activo
+C025,Abastos del Austro,Mayorista,Cuenca,2021-10-13,ventas@abastosaustro.ec,07-284-1199,Activo

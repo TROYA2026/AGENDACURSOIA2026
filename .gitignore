@@ -1,0 +1,41 @@
+# --- Bases de datos (NO subir) ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+agenda.db*
+
+# --- Credenciales / secretos (NO subir) ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+secrets.json
+credentials.json
+*.token
+
+# --- Dependencias y cachés ---
+node_modules/
+__pycache__/
+*.log
+.cache/
+dist/
+build/
+
+# --- Sistema operativo / editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# --- Configuración local de agentes/IA ---
+.opencode/
+.claude/

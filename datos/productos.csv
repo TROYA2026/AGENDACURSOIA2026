@@ -1,0 +1,24 @@
+id_producto,nombre,categoria,unidad_medida,precio_unitario,costo_unitario,stock_actual,proveedor,estado
+P001,Agua Mineral 500 ml,Bebidas,Botella,0.6,0.38,1200,Aquarel S.A.,Activo
+P002,Jugo de Naranja 1 L,Bebidas,Botella,1.85,1.15,480,Frutalec Cia. Ltda.,Activo
+P003,Gaseosa Cola 3 L,Bebidas,Botella,2.1,1.3,650,Bebidas del Valle,Activo
+P004,Cafe Molido 500 g,Bebidas,Funda,4.5,3.05,300,Andina Cafe,Activo
+P005,Te Verde Caja 25,Bebidas,Caja,3.2,2.0,220,Herbarium,Activo
+P006,Bebida Energizante 500 ml,Bebidas,Botella,1.75,1.05,540,Energix,Activo
+P007,Galletas de Chocolate 250 g,Snacks,Paquete,1.4,0.85,700,Dulces del Sur,Activo
+P008,Papas Fritas 180 g,Snacks,Paquete,1.25,0.72,820,Crocantex,Activo
+P009,Mani Salado 200 g,Snacks,Funda,1.1,0.65,460,Crocantex,Activo
+P010,Barritas de Cereal caja 12,Snacks,Caja,5.8,3.9,180,NutriAndes,Activo
+P011,Detergente en Polvo 1 kg,Limpieza,Funda,3.4,2.15,390,LimpioMax,Activo
+P012,Jabon Liquido 1 L,Limpieza,Botella,2.95,1.7,350,LimpioMax,Activo
+P013,Cloro 1 L,Limpieza,Botella,1.3,0.68,500,Quimicos Andinos,Activo
+P014,Limpiador Multiuso 750 ml,Limpieza,Botella,2.2,1.25,410,Quimicos Andinos,Activo
+P015,Papel Higienico 12 rollos,Limpieza,Paquete,6.5,4.2,260,Papelera Nacional,Activo
+P016,Shampoo 750 ml,Cuidado Personal,Botella,4.8,3.1,240,Belleza Andina,Activo
+P017,Pasta Dental 100 ml,Cuidado Personal,Tubo,2.6,1.45,380,Belleza Andina,Activo
+P018,Jabon de Tocador barra,Cuidado Personal,Unidad,0.95,0.5,620,Belleza Andina,Activo
+P019,Arroz 1 kg,Despensa,Funda,1.15,0.8,900,Granos del Litoral,Activo
+P020,Aceite de Girasol 1 L,Despensa,Botella,2.85,2.05,430,Oleaginosas Andinas,Activo
+P021,Atun en Lata 170 g,Despensa,Lata,1.6,1.05,700,Mar Andino,Activo
+P022,Azucar 1 kg,Despensa,Funda,0.9,0.62,850,Ingenio del Valle,Activo
+P023,Fideos 500 g,Despensa,Paquete,0.85,0.52,760,Molinos Andinos,Activo
