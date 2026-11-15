@@ -27,7 +27,7 @@ Todo se guarda en **SQLite** (`agenda.db`) dentro de esta carpeta.
 
 Para ver **solo lo pendiente**:
 
-- En la web: filtro **«Todas / Pendientes»** (recuerda la elección en el navegador).
+- En la web: botón **«Ver solo pendientes»** (recuerda la elección en el navegador).
 - En terminal: opción **6** del menú o `node src/cli.js pending`.
 
 También hay comandos directos, útiles para verificar rápido:
@@ -79,21 +79,6 @@ node src/cli.js summary
   descargas: la app queda realmente utilizable sin conexión.
 - El servidor escucha solo en `127.0.0.1` (no expone la agenda a la red local).
 
-### Interfaz web
-
-Un solo archivo (`public/index.html`), sin frameworks ni fuentes externas:
-
-- **Tema claro y oscuro** automático según el sistema, con botón para cambiarlo
-  y preferencia guardada (`?theme=light` / `?theme=dark` fuerza uno concreto).
-- **Anillo de progreso** del día y barra de avance en cada panel.
-- **Buscador** instantáneo por título (ignora mayúsculas y tildes).
-- **Insignias de urgencia** con lenguaje natural: «Vence hoy», «Vencida hace 2 días».
-- **Modal de confirmación** propio antes de eliminar y avisos breves (toasts)
-  en lugar de `alert()`.
-- **Accesible y responsive**: foco visible, etiquetas para lectores de pantalla,
-  área táctil amplia y una sola columna en móvil. Respeta `prefers-reduced-motion`.
-- El título de la pestaña muestra los pendientes de hoy: `(3) Agenda · Frank`.
-
 ## Si algo falla
 
 | Síntoma | Qué hacer |
@@ -109,6 +94,4 @@ Un solo archivo (`public/index.html`), sin frameworks ni fuentes externas:
 - **Nivel 2:** fecha límite libre y orden por urgencia — ✅ **implementada**
   (campo opcional en CLI y web, insignias de vencida/vence hoy, orden SQL).
 - **Nivel 3:** resumen diario de pendientes — ya incluido en el CLI (`summary`) y
-  en la web (anillo de progreso, contadores y barra de avance).
-- **Nivel 4:** rediseño de la interfaz web — ✅ **implementado** (temas claro/oscuro,
-  buscador, modal de confirmación, toasts y diseño responsive).
+  en la web (chips superiores).

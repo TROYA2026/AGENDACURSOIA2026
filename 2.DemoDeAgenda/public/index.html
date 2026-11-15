@@ -4,885 +4,273 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Agenda personal · Frank</title>
-<meta name="theme-color" content="#6d5efc" />
-<script>
-  // Tema antes del primer pintado para evitar destellos.
-  (function () {
-    try {
-      var forced = new URLSearchParams(location.search).get('theme');
-      var saved = localStorage.getItem('agenda.theme');
-      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset.theme =
-        forced === 'dark' || forced === 'light' ? forced : saved || (dark ? 'dark' : 'light');
-    } catch (e) {
-      document.documentElement.dataset.theme = 'light';
-    }
-  })();
-</script>
 <style>
-  /* ---------------------------------------------------------------- tokens */
   :root {
-    --accent: #6d5efc;
-    --accent-2: #3f8efc;
-    --ok: #0fae7d;
-    --warn: #e08a00;
-    --danger: #e5484d;
-    --radius-lg: 24px;
-    --radius: 20px;
-    --radius-sm: 12px;
-    --font: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system,
-      "Helvetica Neue", Arial, sans-serif;
+    --bg: #0f172a;
+    --card: #1b2438;
+    --card-2: #222e46;
+    --line: #2e3b57;
+    --txt: #e8edf7;
+    --muted: #97a3ba;
+    --accent: #4f9cf9;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --radius: 14px;
   }
-  :root[data-theme="light"] {
-    color-scheme: light;
-    --bg: #f4f6fc;
-    --glow-1: rgba(109, 94, 252, 0.16);
-    --glow-2: rgba(63, 142, 252, 0.14);
-    --surface: #ffffff;
-    --surface-2: #f6f7fc;
-    --surface-3: #eef1f9;
-    --border: #e4e8f4;
-    --border-strong: #ced5e8;
-    --track: #e7eaf6;
-    --text: #161c2e;
-    --muted: #68728c;
-    --shadow: 0 1px 2px rgba(20, 28, 50, 0.05),
-      0 14px 34px -18px rgba(20, 28, 50, 0.24);
-    --shadow-sm: 0 1px 2px rgba(20, 28, 50, 0.06);
-    --accent-soft: rgba(109, 94, 252, 0.1);
-    --ok-soft: rgba(15, 174, 125, 0.1);
-    --warn-soft: rgba(224, 138, 0, 0.12);
-    --danger-soft: rgba(229, 72, 77, 0.1);
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #0a0f1d;
-    --glow-1: rgba(139, 125, 255, 0.22);
-    --glow-2: rgba(63, 142, 252, 0.16);
-    --surface: #131a2b;
-    --surface-2: #182136;
-    --surface-3: #1e2942;
-    --border: #253149;
-    --border-strong: #364564;
-    --track: #23304b;
-    --text: #eaeffb;
-    --muted: #94a1bd;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
-      0 18px 40px -20px rgba(0, 0, 0, 0.85);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-    --accent-soft: rgba(139, 125, 255, 0.14);
-    --ok-soft: rgba(52, 211, 153, 0.12);
-    --warn-soft: rgba(251, 191, 36, 0.12);
-    --danger-soft: rgba(248, 113, 113, 0.12);
-  }
-
-  /* ------------------------------------------------------------------ base */
   * { box-sizing: border-box; }
-  html, body { min-height: 100%; }
   body {
     margin: 0;
-    padding: 26px 20px 64px;
-    font-family: var(--font);
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--text);
-    background:
-      radial-gradient(900px 520px at 6% -12%, var(--glow-1), transparent 62%),
-      radial-gradient(760px 440px at 96% -8%, var(--glow-2), transparent 58%),
-      var(--bg);
-    background-attachment: fixed;
-    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1100px 600px at 15% -10%, #1e2f52 0%, var(--bg) 55%);
+    color: var(--txt);
+    padding: 32px 20px 56px;
   }
-  h1, h2, h3, p { margin: 0; }
-  button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .sr-only {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  header { max-width: 1040px; margin: 0 auto 24px; }
+  h1 { margin: 0; font-size: 1.7rem; letter-spacing: -.02em; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin-top: 6px; font-size: .92rem; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .chip {
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 14px; font-size: .85rem; color: var(--muted);
   }
-  .shell { max-width: 1060px; margin: 0 auto; }
-
-  /* ---------------------------------------------------------------- topbar */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; margin-bottom: 20px;
+  .chip b { color: var(--txt); }
+  .chip.pending b { color: var(--warn); }
+  .chip.done b { color: var(--ok); }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .toggle {
+    background: var(--card); color: var(--txt); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 14px; font: inherit; font-size: .86rem;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
   }
-  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .logo {
-    width: 44px; height: 44px; flex: 0 0 auto; border-radius: 14px;
-    display: grid; place-items: center; color: #fff;
-    background: linear-gradient(140deg, var(--accent), var(--accent-2));
-    box-shadow: 0 8px 18px -8px rgba(109, 94, 252, 0.8);
+  .toggle:hover { border-color: var(--accent); }
+  .toggle[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent);
+    color: #04101f; font-weight: 600;
   }
-  .brand-name { font-weight: 700; font-size: 1.02rem; letter-spacing: -0.01em; }
-  .brand-sub { font-size: 0.78rem; color: var(--muted); }
-  .icon-btn {
-    width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center;
-    border-radius: 13px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--muted);
-    box-shadow: var(--shadow-sm);
-    transition: color 0.15s, border-color 0.15s, transform 0.15s;
+  .hint { color: var(--muted); font-size: .8rem; }
+  main {
+    max-width: 1040px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
   }
-  .icon-btn:hover { color: var(--text); border-color: var(--border-strong); }
-  .icon-btn:active { transform: scale(0.94); }
-  :root[data-theme="light"] .icon-sun,
-  :root[data-theme="dark"] .icon-moon { display: none; }
-
-  /* ------------------------------------------------------------------ hero */
-  .hero {
-    position: relative; overflow: hidden;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center; gap: 28px;
-    padding: 28px 30px;
-    border: 1px solid var(--border); border-radius: var(--radius-lg);
-    background: linear-gradient(150deg, var(--surface), var(--surface-2) 82%);
-    box-shadow: var(--shadow);
+  @media (max-width: 780px) { main { grid-template-columns: 1fr; } }
+  section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px 18px 14px;
+    display: flex; flex-direction: column; min-height: 260px;
   }
-  .hero::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(520px 220px at 100% 0%, var(--accent-soft), transparent 72%);
+  section h2 {
+    margin: 0; font-size: 1.05rem; display: flex; align-items: baseline;
+    justify-content: space-between; gap: 8px;
   }
-  .hero > * { position: relative; z-index: 1; }
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--accent);
-    margin-bottom: 10px;
+  section h2 small { color: var(--muted); font-weight: 400; font-size: .78rem; }
+  ul { list-style: none; margin: 14px 0; padding: 0; flex: 1; }
+  li {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card-2); border: 1px solid transparent;
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    transition: border-color .15s, opacity .15s;
   }
-  .eyebrow::before {
-    content: ""; width: 7px; height: 7px; border-radius: 50%;
-    background: currentColor; box-shadow: 0 0 0 4px var(--accent-soft);
+  li:hover { border-color: var(--line); }
+  li.done .title { text-decoration: line-through; color: var(--muted); }
+  li input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; }
+  .title { flex: 1; font-size: .95rem; word-break: break-word; }
+  .del {
+    background: none; border: 0; color: var(--muted); cursor: pointer;
+    font-size: 1rem; line-height: 1; padding: 4px; border-radius: 6px;
   }
-  h1 {
-    font-size: clamp(1.6rem, 1.15rem + 1.7vw, 2.15rem);
-    font-weight: 750; letter-spacing: -0.03em; line-height: 1.15;
-  }
-  h1 span {
-    background: linear-gradient(105deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .lede {
-    margin-top: 10px; max-width: 46ch;
-    color: var(--muted); font-size: 0.95rem;
-  }
-  .lede strong { color: var(--text); font-weight: 600; }
-
-  .ring-wrap { display: grid; justify-items: center; gap: 10px; }
-  .ring {
-    --p: 0;
-    width: 128px; height: 128px; border-radius: 50%;
-    display: grid; place-items: center;
-    background: conic-gradient(
-      from -90deg, var(--accent) 0%,
-      var(--accent-2) calc(var(--p) * 1%),
-      var(--track) calc(var(--p) * 1%) 100%
-    );
-    box-shadow: inset 0 0 0 1px var(--border), var(--shadow-sm);
-  }
-  .ring-hole {
-    width: 100px; height: 100px; border-radius: 50%;
-    display: grid; place-items: center; text-align: center;
-    background: var(--surface);
-  }
-  .ring-pct { font-size: 1.45rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1; }
-  .ring-note { font-size: 0.72rem; color: var(--muted); }
-  .ring-label { font-size: 0.8rem; color: var(--muted); text-align: center; }
-
-  /* --------------------------------------------------------------- toolbar */
-  .toolbar {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    margin: 22px 0 16px;
-  }
-  .segment {
-    display: inline-flex; gap: 3px; padding: 4px;
-    border: 1px solid var(--border); border-radius: 14px;
-    background: var(--surface-3); box-shadow: var(--shadow-sm);
-  }
-  .segment button {
-    border: 0; background: transparent; color: var(--muted);
-    padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
-    transition: color 0.15s, background 0.15s, box-shadow 0.15s;
-  }
-  .segment button:hover { color: var(--text); }
-  .segment button[aria-pressed="true"] {
-    color: var(--text); background: var(--surface); box-shadow: var(--shadow-sm);
-  }
-  .search {
-    position: relative; flex: 1 1 200px; max-width: 300px; margin-left: auto;
-  }
-  .search svg {
-    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-    color: var(--muted); pointer-events: none;
-  }
-  .search input {
-    width: 100%; padding: 10px 12px 10px 38px;
-    border: 1px solid var(--border); border-radius: 13px;
-    background: var(--surface); color: var(--text);
-    box-shadow: var(--shadow-sm); font-size: 0.88rem;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .search input::placeholder { color: var(--muted); }
-  .search input:focus {
-    outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  .search input::-webkit-search-cancel-button { cursor: pointer; }
-
-  /* ---------------------------------------------------------------- panels */
-  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .panel {
-    display: flex; flex-direction: column;
-    padding: 20px 20px 18px;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: var(--surface); box-shadow: var(--shadow);
-  }
-  .panel-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-bottom: 4px;
-  }
-  .panel-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .panel-icon {
-    width: 40px; height: 40px; flex: 0 0 auto; border-radius: 13px;
-    display: grid; place-items: center;
-  }
-  .panel[data-day="today"] .panel-icon {
-    color: var(--accent); background: var(--accent-soft);
-  }
-  .panel[data-day="tomorrow"] .panel-icon {
-    color: var(--accent-2); background: rgba(63, 142, 252, 0.12);
-  }
-  .panel h2 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; }
-  .panel-date { font-size: 0.78rem; color: var(--muted); }
-  .pill {
-    flex: 0 0 auto; font-size: 0.76rem; font-weight: 600;
-    padding: 5px 11px; border-radius: 999px; white-space: nowrap;
-    color: var(--muted); background: var(--surface-3);
-    border: 1px solid var(--border);
-  }
-  .pill.is-clear { color: var(--ok); background: var(--ok-soft); border-color: transparent; }
-  .pbar {
-    height: 6px; margin: 14px 0 6px; border-radius: 999px;
-    background: var(--track); overflow: hidden;
-  }
-  .pbar i {
-    display: block; height: 100%; width: 0; border-radius: 999px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    transition: width 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
-  }
-  .panel[data-day="tomorrow"] .pbar i {
-    background: linear-gradient(90deg, #2f6fed, #22b8e6);
-  }
-
-  /* ----------------------------------------------------------------- tasks */
-  .tasks {
-    list-style: none; margin: 12px 0 0; padding: 0;
-    display: flex; flex-direction: column; gap: 4px; flex: 1;
-  }
-  .task {
-    display: flex; align-items: flex-start; gap: 11px;
-    padding: 11px 10px 11px 12px; border-radius: 14px;
-    border: 1px solid transparent;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .task:hover, .task:focus-within {
-    background: var(--surface-2); border-color: var(--border);
-  }
-  .check {
-    appearance: none; -webkit-appearance: none;
-    width: 22px; height: 22px; flex: 0 0 auto; margin: 1px 0 0;
-    border: 2px solid var(--border-strong); border-radius: 50%;
-    position: relative; cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, transform 0.12s;
-  }
-  .check:hover { border-color: var(--ok); }
-  .check:active { transform: scale(0.9); }
-  .check:checked {
-    border-color: transparent;
-    background: linear-gradient(140deg, var(--ok), #14b8a6);
-  }
-  .check:checked::after {
-    content: ""; position: absolute; inset: 0;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
-      center / 13px no-repeat;
-  }
-  .task-main { flex: 1; min-width: 0; display: grid; gap: 5px; }
-  .task-title {
-    font-size: 0.93rem; line-height: 1.4;
-    overflow-wrap: anywhere;
-    transition: color 0.15s;
-  }
-  .task.done .task-title {
-    color: var(--muted);
-    text-decoration: line-through;
-    text-decoration-thickness: 1.5px;
-    text-decoration-color: var(--border-strong);
-  }
+  .del:hover { color: var(--danger); background: #ffffff12; }
   .badge {
-    justify-self: start;
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.72rem; font-weight: 600; line-height: 1;
-    padding: 4px 9px; border-radius: 999px; white-space: nowrap;
-    color: var(--muted); background: var(--surface-3);
-    border: 1px solid var(--border);
+    font-size: .72rem; border-radius: 999px; padding: 3px 9px;
+    border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
   }
-  .badge::before {
-    content: ""; width: 6px; height: 6px; border-radius: 50%;
-    background: currentColor; opacity: 0.85;
+  .badge.today {
+    color: var(--warn); border-color: #fbbf2455; background: #fbbf2414;
   }
-  .badge.today { color: var(--warn); background: var(--warn-soft); border-color: transparent; }
-  .badge.overdue { color: var(--danger); background: var(--danger-soft); border-color: transparent; }
-  .task-del {
-    flex: 0 0 auto; display: grid; place-items: center;
-    width: 30px; height: 30px; padding: 0;
-    border: 0; border-radius: 9px; background: transparent; color: var(--muted);
-    opacity: 0; transition: opacity 0.15s, color 0.15s, background 0.15s;
+  .badge.overdue {
+    color: var(--danger); border-color: #f8717155; background: #f8717114;
   }
-  .task:hover .task-del, .task:focus-within .task-del { opacity: 1; }
-  .task-del:hover { color: var(--danger); background: var(--danger-soft); }
-  @media (hover: none) { .task-del { opacity: 1; } }
-
-  .empty {
-    display: grid; justify-items: center; gap: 8px;
-    text-align: center; padding: 26px 16px;
-    color: var(--muted); font-size: 0.86rem;
-    border: 1px dashed var(--border); border-radius: 14px;
-    margin: 6px 0;
+  .empty { color: var(--muted); font-size: .88rem; padding: 10px 2px; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  form input[type="text"] {
+    flex: 1 1 160px;
   }
-  .empty svg { color: var(--accent); opacity: 0.55; }
-  .empty p { max-width: 28ch; }
-
-  /* --------------------------------------------------------------- composer */
-  .composer {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    margin-top: 16px; padding-top: 16px;
-    border-top: 1px dashed var(--border);
+  form input[type="date"] {
+    flex: 0 0 148px; color-scheme: dark;
   }
-  .field {
-    flex: 1 1 150px; min-width: 0;
-    padding: 11px 14px; font-size: 0.9rem;
-    border: 1px solid var(--border); border-radius: 13px;
-    background: var(--surface-2); color: var(--text);
-    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  form input {
+    background: #101827; color: var(--txt);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 12px; font-size: .92rem; font-family: inherit;
   }
-  .field::placeholder { color: var(--muted); }
-  .field:focus {
-    outline: none; background: var(--surface);
-    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form button {
+    background: var(--accent); color: #04101f; border: 0; border-radius: 10px;
+    padding: 0 16px; font-weight: 600; font-size: .9rem; cursor: pointer;
   }
-  .field-date {
-    flex: 0 0 140px; padding: 10px 10px; font-size: 0.82rem;
-    color: var(--muted); cursor: pointer;
-  }
-  .add {
-    flex: 0 0 auto; width: 42px; height: 42px;
-    display: grid; place-items: center; border: 0; border-radius: 13px;
-    color: #fff;
-    background: linear-gradient(140deg, var(--accent), var(--accent-2));
-    box-shadow: 0 10px 20px -10px rgba(109, 94, 252, 0.9);
-    transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
-  }
-  .add:hover { filter: brightness(1.06); transform: translateY(-1px); }
-  .add:active { transform: translateY(0) scale(0.95); }
-  .msg {
-    min-height: 0; margin: 8px 2px 0;
-    font-size: 0.8rem; font-weight: 500; color: var(--danger);
-  }
-  .msg:empty { display: none; }
-
-  /* ---------------------------------------------------------------- footer */
-  footer {
-    display: flex; flex-wrap: wrap; gap: 6px 16px;
-    margin-top: 26px; padding-top: 16px;
-    border-top: 1px solid var(--border);
-    font-size: 0.78rem; color: var(--muted);
-  }
-  footer code {
-    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-    font-size: 0.76rem; color: var(--text);
-    background: var(--surface-3); padding: 2px 6px; border-radius: 6px;
-  }
-
-  /* ----------------------------------------------------------------- toast */
-  .toast {
-    position: fixed; left: 50%; bottom: 26px; z-index: 60;
-    display: flex; align-items: center; gap: 9px;
-    padding: 11px 18px; border-radius: 999px;
-    background: var(--text); color: var(--bg);
-    font-size: 0.85rem; font-weight: 600;
-    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
-    transform: translate(-50%, 22px); opacity: 0; pointer-events: none;
-    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.24s;
-    max-width: min(92vw, 420px);
-  }
-  .toast.show { transform: translate(-50%, 0); opacity: 1; }
-  .toast::before {
-    content: ""; width: 8px; height: 8px; border-radius: 50%;
-    background: currentColor; opacity: 0.6; flex: 0 0 auto;
-  }
-  .toast[data-kind="error"] { background: var(--danger); color: #fff; }
-  .toast[data-kind="ok"] { background: var(--ok); color: #fff; }
-
-  /* ---------------------------------------------------------------- dialog */
-  dialog {
-    width: min(92vw, 400px); padding: 24px;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: var(--surface); color: var(--text);
-    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.6);
-  }
-  dialog::backdrop {
-    background: rgba(10, 15, 29, 0.55);
-    backdrop-filter: blur(3px);
-  }
-  dialog h3 { font-size: 1.05rem; margin-bottom: 6px; }
-  dialog p { color: var(--muted); font-size: 0.88rem; }
-  .dialog-task {
-    margin-top: 12px; padding: 10px 12px;
-    border-radius: 11px; background: var(--surface-2);
-    border: 1px solid var(--border);
-    font-size: 0.88rem; overflow-wrap: anywhere;
-  }
-  .dialog-actions {
-    display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px;
-  }
-  .btn {
-    border: 1px solid var(--border); border-radius: 11px;
-    padding: 9px 16px; font-size: 0.85rem; font-weight: 600;
-    background: var(--surface-2); color: var(--text);
-    transition: filter 0.15s, border-color 0.15s;
-  }
-  .btn:hover { border-color: var(--border-strong); }
-  .btn.danger {
-    border-color: transparent; color: #fff;
-    background: linear-gradient(140deg, #ef4444, #dc2626);
-  }
-  .btn.danger:hover { filter: brightness(1.06); }
-
-  /* ------------------------------------------------------------- responsive */
-  @media (max-width: 900px) {
-    .hero { grid-template-columns: 1fr; gap: 22px; }
-    .ring-wrap { grid-auto-flow: column; justify-content: start; align-items: center; gap: 18px; }
-    .ring { width: 96px; height: 96px; }
-    .ring-hole { width: 74px; height: 74px; }
-    .ring-pct { font-size: 1.15rem; }
-    .board { grid-template-columns: 1fr; }
-    .search { margin-left: 0; flex: 1 1 100%; max-width: none; }
-  }
-  @media (max-width: 520px) {
-    body { padding: 18px 14px 56px; }
-    .hero { padding: 22px; }
-    .panel { padding: 16px 14px 14px; }
-    .brand-sub { display: none; }
-    .field-date { flex: 1 1 120px; }
-    .add { width: 100%; height: 42px; }
-    .toolbar .segment { flex: 1 1 auto; justify-content: center; }
-    .segment button { flex: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.001ms !important;
-      transition-duration: 0.001ms !important;
-    }
-  }
+  form button:hover { filter: brightness(1.08); }
+  .msg { min-height: 18px; font-size: .82rem; color: var(--danger); margin-top: 8px; }
+  footer { max-width: 1040px; margin: 22px auto 0; color: var(--muted); font-size: .78rem; }
+  footer code { color: var(--txt); }
 </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <div class="brand">
-        <span class="logo" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="17" rx="4"></rect>
-            <path d="M8 2v4M16 2v4M3 10h18"></path>
-            <path d="m9 15.5 2 2 4-4"></path>
-          </svg>
-        </span>
-        <div>
-          <div class="brand-name">Agenda personal</div>
-          <div class="brand-sub">Todo se guarda en tu equipo, sin internet</div>
-        </div>
-      </div>
-      <button type="button" id="themeToggle" class="icon-btn" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">
-        <svg class="icon-sun" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
-        </svg>
-        <svg class="icon-moon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-        </svg>
+  <header>
+    <h1>Agenda personal de <span id="owner">Frank</span></h1>
+    <div class="sub">
+      Hoy es <b id="todayDate">…</b>. Todo se guarda en tu equipo, sin internet.
+      Las tareas se ordenan por urgencia: primero la fecha límite más próxima.
+    </div>
+    <div class="chips">
+      <div class="chip pending">Pendientes hoy: <b id="pendingToday">0</b></div>
+      <div class="chip pending">Pendientes mañana: <b id="pendingTomorrow">0</b></div>
+      <div class="chip done">Hechas hoy: <b id="doneToday">0</b></div>
+      <div class="chip done">Hechas mañana: <b id="doneTomorrow">0</b></div>
+    </div>
+    <div class="toolbar">
+      <button type="button" id="togglePending" class="toggle" aria-pressed="false">
+        Ver solo pendientes
       </button>
-    </header>
+      <span class="hint" id="viewHint">Mostrando todas las tareas.</span>
+    </div>
+  </header>
 
-    <section class="hero" aria-labelledby="greeting">
-      <div>
-        <p class="eyebrow" id="todayText">Hoy</p>
-        <h1 id="greeting">Hola, <span id="owner">Frank</span> 👋</h1>
-        <p class="lede" id="lede">Cargando tu agenda…</p>
-      </div>
-      <div class="ring-wrap">
-        <div class="ring" id="ring" role="img" aria-label="Progreso de hoy">
-          <div class="ring-hole">
-            <div>
-              <div class="ring-pct" id="ringPct">0%</div>
-              <div class="ring-note">de hoy</div>
-            </div>
-          </div>
-        </div>
-        <p class="ring-label" id="ringLabel">Sin tareas todavía</p>
-      </div>
+  <main>
+    <section data-day="today">
+      <h2>Hoy <small id="dateToday"></small></h2>
+      <ul id="listToday"></ul>
+      <form data-day="today">
+        <input type="text" placeholder="Nueva tarea para hoy…" maxlength="200" required />
+        <input type="date" class="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
+        <button type="submit">Agregar</button>
+      </form>
+      <div class="msg" aria-live="polite"></div>
     </section>
 
-    <div class="toolbar">
-      <div class="segment" role="group" aria-label="Filtrar tareas">
-        <button type="button" data-only="0" aria-pressed="true">Todas</button>
-        <button type="button" data-only="1" aria-pressed="false">Pendientes</button>
-      </div>
-      <div class="search">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m20 20-3.2-3.2"></path>
-        </svg>
-        <label class="sr-only" for="search">Buscar tarea</label>
-        <input id="search" type="search" placeholder="Buscar tarea…" autocomplete="off" />
-      </div>
-    </div>
+    <section data-day="tomorrow">
+      <h2>Mañana <small id="dateTomorrow"></small></h2>
+      <ul id="listTomorrow"></ul>
+      <form data-day="tomorrow">
+        <input type="text" placeholder="Nueva meta para mañana…" maxlength="200" required />
+        <input type="date" class="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
+        <button type="submit">Agregar</button>
+      </form>
+      <div class="msg" aria-live="polite"></div>
+    </section>
+  </main>
 
-    <main class="board">
-      <section class="panel" data-day="today" aria-labelledby="hoyTitle">
-        <header class="panel-head">
-          <div class="panel-title">
-            <span class="panel-icon" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4.2"></circle>
-                <path d="M12 2.6v2.2M12 19.2v2.2M3.6 12h2.2M18.2 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M5.8 18.2l1.6-1.6M16.6 7.4l1.6-1.6"></path>
-              </svg>
-            </span>
-            <div>
-              <h2 id="hoyTitle">Hoy</h2>
-              <p class="panel-date" id="dateToday"></p>
-            </div>
-          </div>
-          <span class="pill" id="pillToday">0 por hacer</span>
-        </header>
-        <div class="pbar" aria-hidden="true"><i id="barToday"></i></div>
-        <ul class="tasks" id="listToday"></ul>
-        <form class="composer" data-day="today">
-          <label class="sr-only" for="newToday">Nueva tarea para hoy</label>
-          <input class="field" id="newToday" type="text" placeholder="Nueva tarea para hoy…" maxlength="200" autocomplete="off" required />
-          <input class="field field-date" type="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
-          <button class="add" type="submit" aria-label="Agregar tarea de hoy" title="Agregar tarea">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
-              <path d="M12 5v14M5 12h14"></path>
-            </svg>
-          </button>
-        </form>
-        <p class="msg" role="alert"></p>
-      </section>
-
-      <section class="panel" data-day="tomorrow" aria-labelledby="mananaTitle">
-        <header class="panel-head">
-          <div class="panel-title">
-            <span class="panel-icon" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.2 15.3A8.5 8.5 0 1 1 8.7 3.8a6.8 6.8 0 0 0 11.5 11.5z"></path>
-              </svg>
-            </span>
-            <div>
-              <h2 id="mananaTitle">Mañana</h2>
-              <p class="panel-date" id="dateTomorrow"></p>
-            </div>
-          </div>
-          <span class="pill" id="pillTomorrow">0 por hacer</span>
-        </header>
-        <div class="pbar" aria-hidden="true"><i id="barTomorrow"></i></div>
-        <ul class="tasks" id="listTomorrow"></ul>
-        <form class="composer" data-day="tomorrow">
-          <label class="sr-only" for="newTomorrow">Nueva meta para mañana</label>
-          <input class="field" id="newTomorrow" type="text" placeholder="Nueva meta para mañana…" maxlength="200" autocomplete="off" required />
-          <input class="field field-date" type="date" aria-label="Fecha límite (opcional)" title="Fecha límite (opcional)" />
-          <button class="add" type="submit" aria-label="Agregar meta de mañana" title="Agregar meta">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
-              <path d="M12 5v14M5 12h14"></path>
-            </svg>
-          </button>
-        </form>
-        <p class="msg" role="alert"></p>
-      </section>
-    </main>
-
-    <footer>
-      <span>Base local: <code>agenda.db</code></span>
-      <span>Interfaz en <code>http://localhost:3000</code></span>
-      <span>Las tareas se ordenan por urgencia.</span>
-    </footer>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <dialog id="confirm" aria-labelledby="confirmTitle">
-    <h3 id="confirmTitle">¿Eliminar esta tarea?</h3>
-    <p>Esta acción no se puede deshacer.</p>
-    <div class="dialog-task" id="confirmText"></div>
-    <form method="dialog" class="dialog-actions">
-      <button class="btn" value="cancel" autofocus>Cancelar</button>
-      <button class="btn danger" value="ok">Eliminar</button>
-    </form>
-  </dialog>
+  <footer>
+    Base local: <code>agenda.db</code> (SQLite) · Interfaz en <code>http://localhost:3000</code>
+  </footer>
 
 <script>
   const $ = (id) => document.getElementById(id);
 
-  const state = {
-    onlyPending: false,
-    query: '',
-    data: null,
-  };
+  // Reto Nivel 1: vista «solo pendientes». Se recuerda en el navegador.
+  let onlyPending = false;
+  try { onlyPending = localStorage.getItem('agenda.onlyPending') === '1'; } catch {}
+  let lastData = null;
 
-  /* ------------------------------------------------------------- utilidades */
-  try {
-    state.onlyPending = localStorage.getItem('agenda.onlyPending') === '1';
-  } catch {}
+  function updateToggle() {
+    const button = $('togglePending');
+    button.setAttribute('aria-pressed', String(onlyPending));
+    button.textContent = onlyPending ? 'Viendo solo pendientes' : 'Ver solo pendientes';
+    $('viewHint').textContent = onlyPending
+      ? 'Mostrando únicamente las tareas pendientes.'
+      : 'Mostrando todas las tareas.';
+  }
 
-  const isoToUTC = (iso) => {
-    const [y, m, d] = iso.split('-').map(Number);
-    return Date.UTC(y, m - 1, d);
-  };
-  const dayDiff = (a, b) => Math.round((isoToUTC(b) - isoToUTC(a)) / 86400000);
-
-  function longDate(iso) {
-    const [y, m, d] = iso.split('-').map(Number);
-    const text = new Date(y, m - 1, d).toLocaleDateString('es-EC', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    });
-    return text.charAt(0).toUpperCase() + text.slice(1);
+  function setOnlyPending(value) {
+    onlyPending = value;
+    try { localStorage.setItem('agenda.onlyPending', value ? '1' : '0'); } catch {}
+    updateToggle();
+    if (lastData) render(lastData);
   }
 
   function shortDate(iso) {
     const [y, m, d] = iso.split('-').map(Number);
     return new Date(y, m - 1, d).toLocaleDateString('es-EC', {
-      weekday: 'short', day: '2-digit', month: 'short',
+      day: '2-digit',
+      month: 'short',
     });
   }
 
-  const normalize = (text) =>
-    text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-  const matches = (task) =>
-    !state.query || normalize(task.title).includes(normalize(state.query));
-
-  /* ------------------------------------------------------------------- tema */
-  function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    $('themeToggle').setAttribute(
-      'aria-label',
-      theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
-    );
-    try { localStorage.setItem('agenda.theme', theme); } catch {}
-  }
-
-  $('themeToggle').addEventListener('click', () => {
-    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-  });
-
-  /* ------------------------------------------------------------------ toast */
-  let toastTimer;
-  function toast(message, kind = 'info') {
-    const el = $('toast');
-    el.textContent = message;
-    el.dataset.kind = kind;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
-  }
-
-  /* ------------------------------------------------------------------ modal */
-  let resolveDelete = null;
-  $('confirm').addEventListener('close', () => {
-    if (!resolveDelete) return;
-    const accepted = $('confirm').returnValue === 'ok';
-    resolveDelete(accepted);
-    resolveDelete = null;
-  });
-
-  function askDelete(title) {
-    return new Promise((resolve) => {
-      $('confirmText').textContent = title;
-      $('confirm').returnValue = 'cancel';
-      resolveDelete = resolve;
-      $('confirm').showModal();
-    });
-  }
-
-  /* ------------------------------------------------------------------ vista */
-  function badgeFor(task) {
+  // Reto Nivel 2: insignia de fecha límite con su nivel de urgencia.
+  function deadlineBadge(task) {
     if (!task.deadline) return null;
     const badge = document.createElement('span');
-    badge.className = 'badge';
+    badge.className =
+      'badge' + (task.overdue ? ' overdue' : task.dueToday ? ' today' : '');
+    badge.textContent = task.overdue
+      ? 'Vencida ' + shortDate(task.deadline)
+      : task.dueToday
+        ? 'Vence hoy'
+        : 'Límite ' + shortDate(task.deadline);
     badge.title = 'Fecha límite: ' + task.deadline;
-
-    if (task.overdue) {
-      const days = dayDiff(task.deadline, state.data.todayDate);
-      badge.classList.add('overdue');
-      badge.textContent =
-        days <= 1 ? 'Vencida ayer' : `Vencida hace ${days} días`;
-    } else if (task.dueToday) {
-      badge.classList.add('today');
-      badge.textContent = 'Vence hoy';
-    } else {
-      badge.textContent = 'Límite ' + shortDate(task.deadline);
-    }
     return badge;
   }
 
-  function emptyState(message) {
-    const li = document.createElement('li');
-    li.className = 'empty';
-    li.innerHTML =
-      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"></path>' +
-      '<path d="M18 15l.9 2.1 2.1.9-2.1.9L18 21l-.9-2.1-2.1-.9 2.1-.9L18 15z"></path>' +
-      '</svg>';
-    const p = document.createElement('p');
-    p.textContent = message;
-    li.appendChild(p);
-    return li;
-  }
-
-  function renderList(ul, tasks, message) {
-    ul.textContent = '';
+  function renderList(ul, tasks, emptyText) {
+    ul.innerHTML = '';
     if (tasks.length === 0) {
-      ul.appendChild(emptyState(message));
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = emptyText;
+      ul.appendChild(li);
       return;
     }
-
-    const fragment = document.createDocumentFragment();
     for (const task of tasks) {
       const li = document.createElement('li');
-      li.className = 'task' + (task.done ? ' done' : '');
+      if (task.done) li.classList.add('done');
 
       const check = document.createElement('input');
       check.type = 'checkbox';
-      check.className = 'check';
       check.checked = task.done;
-      check.setAttribute('aria-label', task.title);
       check.title = task.done ? 'Marcar como pendiente' : 'Marcar como hecha';
-      check.addEventListener('change', () => toggleTask(task));
-
-      const main = document.createElement('div');
-      main.className = 'task-main';
+      check.addEventListener('change', () => toggle(task.id));
 
       const title = document.createElement('span');
-      title.className = 'task-title';
+      title.className = 'title';
       title.textContent = task.title;
-      main.appendChild(title);
 
-      const badge = badgeFor(task);
-      if (badge) main.appendChild(badge);
+      const badge = deadlineBadge(task);
 
       const del = document.createElement('button');
-      del.type = 'button';
-      del.className = 'task-del';
+      del.className = 'del';
+      del.textContent = '✕';
       del.title = 'Eliminar tarea';
-      del.setAttribute('aria-label', 'Eliminar «' + task.title + '»');
-      del.innerHTML =
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' +
-        '<path d="M4 7h16M9.5 7V5.2A1.2 1.2 0 0 1 10.7 4h2.6a1.2 1.2 0 0 1 1.2 1.2V7"></path>' +
-        '<path d="M6.2 7l.8 12a2 2 0 0 0 2 1.9h6a2 2 0 0 0 2-1.9l.8-12"></path>' +
-        '<path d="M10.5 11v6M13.5 11v6"></path></svg>';
-      del.addEventListener('click', () => removeTask(task));
+      del.addEventListener('click', () => remove(task.id));
 
-      li.append(check, main, del);
-      fragment.appendChild(li);
+      li.append(check, title);
+      if (badge) li.appendChild(badge);
+      li.appendChild(del);
+      ul.appendChild(li);
     }
-    ul.appendChild(fragment);
-  }
-
-  function summaryOf(day) {
-    const s = state.data.summary[day];
-    const total = Number(s.total);
-    const pending = Number(s.pending);
-    return { total, pending, done: total - pending };
-  }
-
-  function setProgress(day, info) {
-    const pct = info.total ? Math.round((info.done / info.total) * 100) : 0;
-    $('bar' + (day === 'today' ? 'Today' : 'Tomorrow')).style.width = pct + '%';
-
-    const pill = $('pill' + (day === 'today' ? 'Today' : 'Tomorrow'));
-    if (info.total === 0) {
-      pill.textContent = 'Sin tareas';
-      pill.classList.remove('is-clear');
-    } else if (info.pending === 0) {
-      pill.textContent = '¡Completado!';
-      pill.classList.add('is-clear');
-    } else {
-      pill.textContent = info.pending + ' por hacer';
-      pill.classList.remove('is-clear');
-    }
-    return pct;
-  }
-
-  function emptyText(day, info) {
-    if (state.query) return 'No hay tareas que coincidan con tu búsqueda.';
-    if (state.onlyPending) return '¡Nada pendiente por aquí! 🎉';
-    return day === 'today'
-      ? 'Aún no hay tareas para hoy. Agrega la primera aquí abajo.'
-      : 'Aún no hay metas para mañana. Agrega la primera aquí abajo.';
   }
 
   function render(data) {
-    state.data = data;
-
     $('owner').textContent = data.owner;
-    $('todayText').textContent = longDate(data.todayDate);
-    $('dateToday').textContent = shortDate(data.todayDate);
-    $('dateTomorrow').textContent = shortDate(data.tomorrowDate);
+    $('todayDate').textContent = data.todayDate;
+    $('dateToday').textContent = data.todayDate;
+    $('dateTomorrow').textContent = data.tomorrowDate;
 
-    const today = summaryOf('today');
-    const tomorrow = summaryOf('tomorrow');
+    $('pendingToday').textContent = data.summary.today.pending;
+    $('pendingTomorrow').textContent = data.summary.tomorrow.pending;
+    $('doneToday').textContent = data.summary.today.total - data.summary.today.pending;
+    $('doneTomorrow').textContent = data.summary.tomorrow.total - data.summary.tomorrow.pending;
 
-    const pct = setProgress('today', today);
-    setProgress('tomorrow', tomorrow);
+    const visible = (list) => (onlyPending ? list.filter((t) => !t.done) : list);
 
-    $('ring').style.setProperty('--p', String(pct));
-    $('ringPct').textContent = pct + '%';
-    $('ringLabel').textContent = today.total
-      ? `${today.done} de ${today.total} completadas`
-      : 'Sin tareas todavía';
-
-    const parts = [];
-    if (today.total === 0) {
-      parts.push('Aún no hay tareas para hoy. Empieza con algo pequeño.');
-    } else if (today.pending === 0) {
-      parts.push('¡Todo listo por hoy! 🎉 No queda nada pendiente.');
-    } else {
-      parts.push(
-        today.pending === 1
-          ? 'Te queda <strong>1 tarea</strong> para hoy.'
-          : `Te quedan <strong>${today.pending} tareas</strong> para hoy.`
-      );
-    }
-    if (tomorrow.pending === 0) {
-      parts.push('Mañana lo tienes libre.');
-    } else if (tomorrow.pending === 1) {
-      parts.push('Mañana tienes <strong>1 meta</strong>.');
-    } else {
-      parts.push(`Mañana tienes <strong>${tomorrow.pending} metas</strong>.`);
-    }
-    $('lede').innerHTML = parts.join(' ');
-
-    const filter = (list) =>
-      list.filter((t) => (!state.onlyPending || !t.done) && matches(t));
-
-    renderList($('listToday'), filter(data.today), emptyText('today', today));
-    renderList($('listTomorrow'), filter(data.tomorrow), emptyText('tomorrow', tomorrow));
-
-    document.title = today.pending
-      ? `(${today.pending}) Agenda · ${data.owner}`
-      : `Agenda · ${data.owner}`;
+    renderList($('listToday'), visible(data.today), onlyPending
+      ? 'No quedan tareas pendientes para hoy.'
+      : 'No hay tareas para hoy. Agrega la primera abajo.');
+    renderList($('listTomorrow'), visible(data.tomorrow), onlyPending
+      ? 'No quedan metas pendientes para mañana.'
+      : 'No hay metas para mañana. Agrega la primera abajo.');
   }
 
-  /* -------------------------------------------------------------------- API */
   async function api(path, options) {
     const res = await fetch(path, {
       headers: { 'Content-Type': 'application/json' },
@@ -895,54 +283,33 @@
 
   async function refresh() {
     try {
-      render(await api('/api/tasks'));
+      lastData = await api('/api/tasks');
+      render(lastData);
     } catch (err) {
       document.querySelectorAll('.msg').forEach((m) => (m.textContent = err.message));
-      toast(err.message, 'error');
     }
   }
 
-  async function toggleTask(task) {
+  async function toggle(id) {
     try {
-      await api('/api/tasks/' + task.id + '/toggle', { method: 'POST' });
+      await api('/api/tasks/' + id + '/toggle', { method: 'POST' });
       await refresh();
     } catch (err) {
-      toast(err.message, 'error');
+      alert(err.message);
       await refresh();
     }
   }
 
-  async function removeTask(task) {
-    if (!(await askDelete(task.title))) return;
+  async function remove(id) {
+    if (!confirm('¿Eliminar esta tarea?')) return;
     try {
-      await api('/api/tasks/' + task.id, { method: 'DELETE' });
-      toast('Tarea eliminada', 'ok');
+      await api('/api/tasks/' + id, { method: 'DELETE' });
       await refresh();
     } catch (err) {
-      toast(err.message, 'error');
+      alert(err.message);
     }
   }
 
-  /* ----------------------------------------------------------------- filtros */
-  function setOnlyPending(value) {
-    state.onlyPending = value;
-    try { localStorage.setItem('agenda.onlyPending', value ? '1' : '0'); } catch {}
-    document.querySelectorAll('.segment button').forEach((b) => {
-      b.setAttribute('aria-pressed', String(b.dataset.only === (value ? '1' : '0')));
-    });
-    if (state.data) render(state.data);
-  }
-
-  document.querySelectorAll('.segment button').forEach((button) => {
-    button.addEventListener('click', () => setOnlyPending(button.dataset.only === '1'));
-  });
-
-  $('search').addEventListener('input', (event) => {
-    state.query = event.target.value.trim();
-    if (state.data) render(state.data);
-  });
-
-  /* --------------------------------------------------------------- formularios */
   document.querySelectorAll('form[data-day]').forEach((form) => {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -951,15 +318,10 @@
       const msg = form.parentElement.querySelector('.msg');
       const title = input.value.trim();
       msg.textContent = '';
-
       if (!title) {
         msg.textContent = 'Escribe un título antes de agregar.';
-        input.focus();
         return;
       }
-
-      const button = form.querySelector('.add');
-      button.disabled = true;
       try {
         await api('/api/tasks', {
           method: 'POST',
@@ -971,18 +333,17 @@
         });
         input.value = '';
         dateInput.value = '';
-        await refresh();
         input.focus();
+        await refresh();
       } catch (err) {
         msg.textContent = err.message;
-      } finally {
-        button.disabled = false;
       }
     });
   });
 
-  /* ------------------------------------------------------------------- inicio */
-  setOnlyPending(state.onlyPending);
+  $('togglePending').addEventListener('click', () => setOnlyPending(!onlyPending));
+
+  updateToggle();
   refresh();
 </script>
 </body>

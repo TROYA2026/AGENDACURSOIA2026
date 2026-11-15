@@ -15,8 +15,6 @@ Bitácora para que cualquier sesión (humana o IA) retome el trabajo sin releer 
 - [x] Reto Nivel 1: vista «solo pendientes» (web y CLI) con prueba automática.
 - [x] Reto Nivel 2: fecha límite opcional, insignias de urgencia y orden por urgencia.
 - [x] Migración automática de `agenda.db` (columna `deadline` en bases antiguas).
-- [x] Rediseño de la interfaz web: tema claro/oscuro, anillo de progreso,
-      buscador, modal de confirmación y avisos tipo toast.
 
 ## Decisiones tomadas
 
@@ -31,7 +29,6 @@ Bitácora para que cualquier sesión (humana o IA) retome el trabajo sin releer 
 | 2026-11-14 | Filtro «solo pendientes» en SQL, no solo en la interfaz | Una sola regla para CLI y web; la consulta ya excluye `done = 1`. |
 | 2026-11-14 | Fecha límite como columna `deadline` nullable + migración ALTER TABLE | No se pierde nada de la base existente; las tareas sin límite quedan al final. |
 | 2026-11-14 | Orden por urgencia en SQL: `(deadline IS NULL), deadline, id` | Mismo criterio en CLI y web sin duplicar lógica. |
-| 2026-11-15 | Rediseño en un solo `index.html`, sin frameworks ni fuentes externas | La app debe funcionar sin internet y sin `npm install`. |
 
 ## Cómo retomar
 
